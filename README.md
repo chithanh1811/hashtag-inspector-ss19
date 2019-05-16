@@ -30,3 +30,25 @@ Nicolas Autzen
 *  Sprachunterstützung: https://cloud.google.com/natural-language/docs/languages (Was passiert wenn die Sprache des Tweets nicht unterstützt wird?)
 *  Die Zahl der Query wird begrenzt
 
+## JSON Requests and answers
+### Request parameter we need
+* lang (We should restrict the language to just english and german tweets)
+* result_type (mixed, recent, popular: maybe defined by user)
+* count (number of tweets per page, default:15, maximum:100)
+
+### Answer parameters we need
+* created_at
+* text
+* entities
+    * ...hashtags
+    * ...urls
+        * ...url
+* user
+    * ...name (e.g. Nasa)
+    * screenname (@Nasa)
+    * profile_background_image_url
+    * profile_image_url
+* retweet_count
+* favorite_count
+
+
