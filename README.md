@@ -38,11 +38,10 @@ Nicolas Autzen
 
 ### Answer parameters we need
 * created_at
+* id 
 * text
 * entities
     * ...hashtags
-    * ...urls
-        * ...url
 * user
     * ...name (e.g. Nasa)
     * screenname (@Nasa)
