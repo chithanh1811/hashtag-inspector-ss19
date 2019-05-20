@@ -46,7 +46,6 @@ Nicolas Autzen
 * user
     * ...name (e.g. Nasa)
     * screenname (@Nasa)
-    * profile_background_image_url
     * profile_image_url
 * retweet_count
 * favorite_count
