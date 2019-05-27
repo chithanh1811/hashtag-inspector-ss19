@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">HashTagInsepctor</string>
-    <string name="title_home">Trends</string>
-    <string name="title_dashboard">Search</string>
-    <string name="title_notifications">History</string>
-</resources>
