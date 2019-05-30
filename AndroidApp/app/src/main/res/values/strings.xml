@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Hashtag_Inspector</string>
+    <string name="hashtag_inspector">Hashtag Inspector</string>
+    <string name="search_button">Begin the Ultimate Search</string>
+    <string name="search_field">Enter a String</string>
+    <string name="hashtag_query">Enter a Hashtag</string>
+    <string name="action_search" />
+</resources>
