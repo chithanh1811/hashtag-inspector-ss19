@@ -16,7 +16,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
     private SQLiteDatabase database;
 
+    // das hier muss auch geloescht werden, denn vinz ist dafuer zustaendig
+    private ArrayList<String> listOfAllHashtags = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
         SearchQueryDBHelper dbHelper = new SearchQueryDBHelper(this);
         database = dbHelper.getWritableDatabase();
-
+        // to clear database entries, uncomment the following line
+//        dbHelper.onUpgrade(database, 1, 1);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -109,7 +117,10 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println(te.getMessage());
             }
             System.out.println("Number of Tweets: " + countNumberOfTweets);
+            countNumberOfOccurrences();
         });
+
+
 
     }
 
@@ -132,11 +143,13 @@ public class MainActivity extends AppCompatActivity {
         Matcher mat = MY_PATTERN.matcher(someSampleText);
         List<String> listOfHashtagsInTheString = new ArrayList<>();
         while (mat.find()) {
-            listOfHashtagsInTheString.add(mat.group(1));
+            listOfHashtagsInTheString.add(mat.group(1).toLowerCase());
+
         }
         for (String s : listOfHashtagsInTheString) {
             System.out.println("Hashtag: " + s);
         }
+        listOfAllHashtags.addAll(listOfHashtagsInTheString);
         System.out.println("++++++---------------------------------------------------++++++++");
     }
 
@@ -149,5 +162,31 @@ public class MainActivity extends AppCompatActivity {
 
     private Cursor getAllItems() {
         return database.query(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null, null, null, null, null);
+    }
+
+    // das muss noch geloescht werden, denn Vinz ist dafuer zustaendig
+    public  void countNumberOfOccurrences() {
+        ArrayList<HashtagAndOccurences> occurrences = new ArrayList<>();
+        Set<String> listOfAllHashtagsWithoutDuplicates = new TreeSet<>(listOfAllHashtags);
+
+        for (String s : listOfAllHashtagsWithoutDuplicates) {
+            occurrences.add(new HashtagAndOccurences(s, Collections.frequency(listOfAllHashtags, s)));
+        }
+
+        System.out.println("Alle Hhashtags in dieser Suchanfrage ist wie folgt: ");
+        System.out.println(Arrays.toString(listOfAllHashtags.toArray()));
+        System.out.println("Unsorted List: ");
+        System.out.println("Number of Occurrences of each item is: " + Arrays.toString(occurrences.toArray()));
+
+
+        Collections.sort(occurrences, Comparator.comparing(HashtagAndOccurences::getNumberOfOccurrences)
+                .thenComparing(HashtagAndOccurences::getHashtagName));
+
+        System.out.println("-----------------------------------------------------");
+        System.out.println("Sorted List: ");
+        for (HashtagAndOccurences hashtagAndOccurences : occurrences) {
+            System.out.println("Hashtag: " + hashtagAndOccurences.getHashtagName() + " || number of occurs: " + hashtagAndOccurences.getNumberOfOccurrences());
+        }
+
     }
 }
