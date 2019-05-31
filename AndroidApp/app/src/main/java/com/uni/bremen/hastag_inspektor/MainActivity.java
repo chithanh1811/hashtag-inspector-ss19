@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
 import twitter4j.Query;
 import twitter4j.QueryResult;
 import twitter4j.Status;
+import twitter4j.Trend;
+import twitter4j.Trends;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private String userInput;
     // Button
     private Button searchButton;
+    private Button trendButton;
+
     // The EditText view
     private EditText mSearchQueryEditText;
     // for Twitter4j
@@ -47,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     private SearchQueryAdapter searchQueryAdapter;
 
     private SQLiteDatabase database;
+
+    //The location is a WOEID, 1 means global. Used for getting the trends
+    private int location=1;
 
     // das hier muss auch geloescht werden, denn vinz ist dafuer zustaendig
     private ArrayList<String> listOfAllHashtags = new ArrayList<>();
@@ -89,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         mSearchQueryEditText = findViewById(R.id.searchQueryEditText);
         searchButton = findViewById(R.id.button);
+        trendButton = findViewById(R.id.trendButton);
         TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
         Twitter twitter = tf.getInstance();
 
@@ -120,8 +128,21 @@ public class MainActivity extends AppCompatActivity {
             countNumberOfOccurrences();
         });
 
+        trendButton.setOnClickListener(v -> {
+            try {
+                Trends trends = twitter.getPlaceTrends(location);
+                System.out.println("Showing trends for " + trends.getLocation().getName());
 
+                for (Trend trend : trends.getTrends()) {
+                    System.out.println(String.format("%s (tweet_volume: %d)", trend.getName(), trend.getTweetVolume()));
+                }
+                System.out.println("done, creating the trends.");
+            }
+            catch (TwitterException te) {
+                System.out.println(te.getMessage());
+            }
 
+        });
     }
 
     private void addToDb() {
