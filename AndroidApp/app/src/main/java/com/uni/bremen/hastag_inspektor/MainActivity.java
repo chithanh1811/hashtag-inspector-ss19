@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
     private SQLiteDatabase database;
 
-    // das hier muss auch geloescht werden, denn vinz ist dafuer zustaendig
     private ArrayList<String> listOfAllHashtags = new ArrayList<>();
 
     @Override
@@ -87,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 .setOAuthAccessTokenSecret("YutFlDv8mP7GDiycmSNlvQ7wQYWCafphEjK6j6cmT4bNU");
 
 
+
         mSearchQueryEditText = findViewById(R.id.searchQueryEditText);
         searchButton = findViewById(R.id.button);
         TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
@@ -97,10 +97,9 @@ public class MainActivity extends AppCompatActivity {
 
             userInput = mSearchQueryEditText.getText().toString();
             addToDb();
-//            searchButton.setEnabled(false);
             System.out.println("The user has entered the following test: " + userInput);
             System.out.println("mTextMessage.getText() is = " + mSearchQueryEditText.getText().toString());
-            Query query = new Query(userInput);
+            Query query = new Query(userInput + " -filter:retweets");
             query.setLang("de");
             query.setCount(50);
             int countNumberOfTweets = 0;
@@ -164,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
         return database.query(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null, null, null, null, null);
     }
 
-    // das muss noch geloescht werden, denn Vinz ist dafuer zustaendig
     public  void countNumberOfOccurrences() {
         ArrayList<HashtagAndOccurences> occurrences = new ArrayList<>();
         Set<String> listOfAllHashtagsWithoutDuplicates = new TreeSet<>(listOfAllHashtags);
