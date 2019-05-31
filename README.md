@@ -25,6 +25,10 @@ Nicolas Autzen
 
 2.    #-Liste verändern und in die Zwischenablage kopieren
 
+3.    Die Yahoo API nutzen um die WOEID herauszufinden
+*  Nützlich um automatisch zu erkennen, von welcher location die Trends kommen sollen
+*  [](https://stackoverflow.com/questions/14325474/get-woeid-in-android)
+
 ## Probleme 
 *  Die "Hashtag"-liste in Response kann manchmal leer sein, obwohl es eigtl. #'s im Tweet gibt.
 *  Sprachunterstützung: https://cloud.google.com/natural-language/docs/languages (Was passiert wenn die Sprache des Tweets nicht unterstützt wird?)
