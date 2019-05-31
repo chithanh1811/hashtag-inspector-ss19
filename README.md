@@ -27,7 +27,7 @@ Nicolas Autzen
 
 3.    Die Yahoo API nutzen um die WOEID herauszufinden
 *  Nützlich um automatisch zu erkennen, von welcher location die Trends kommen sollen
-*  [](https://stackoverflow.com/questions/14325474/get-woeid-in-android)
+*  https://stackoverflow.com/questions/14325474/get-woeid-in-android
 
 ## Probleme 
 *  Die "Hashtag"-liste in Response kann manchmal leer sein, obwohl es eigtl. #'s im Tweet gibt.
