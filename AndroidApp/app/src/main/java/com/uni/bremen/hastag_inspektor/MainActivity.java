@@ -8,10 +8,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.StrictMode;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -52,17 +56,20 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> listOfAllHashtags = new ArrayList<>();
 
     // muss das hier deklariert werden, denn wir brauchen dies hier spaeter in unserer second-activity
-    private static ArrayList<HashtagAndOccurences> occurrences = new ArrayList<>();
+    private static ArrayList<HashtagAndOccurences> occurrencesArrayList = new ArrayList<>();
+
+    public static boolean clearHistory = false;
+    private Button mClearHistoryButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         SearchQueryDBHelper dbHelper = new SearchQueryDBHelper(this);
         database = dbHelper.getWritableDatabase();
-        // to clear database entries, uncomment the following line
-//        dbHelper.onUpgrade(database, 1, 1);
+        dbHelper.onCreate(database);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -95,17 +102,42 @@ public class MainActivity extends AppCompatActivity {
         TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
         Twitter twitter = tf.getInstance();
 
+        searchButton.setEnabled(false);
+
+        mSearchQueryEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                String hashTag = mSearchQueryEditText.getText().toString().trim();
+                searchButton.setEnabled(hashTag.isEmpty());
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String hashTag = mSearchQueryEditText.getText().toString().trim();
+                searchButton.setEnabled(!hashTag.isEmpty());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String hashTag = mSearchQueryEditText.getText().toString().trim();
+                searchButton.setEnabled(!hashTag.isEmpty());
+            }
+        });
+
 
         searchButton.setOnClickListener(v -> {
             userInput = mSearchQueryEditText.getText().toString();
+
+            if (userInput.charAt(0) != '#') {
+                userInput = "#" + userInput;
+            }
             addToDb();
             System.out.println("The user has entered the following test: " + userInput);
             System.out.println("mTextMessage.getText() is = " + mSearchQueryEditText.getText().toString());
             Query query = new Query(userInput + " -filter:retweets");
-            query.setLang("de");
+//            query.setLang("de");
             query.setCount(50);
             int countNumberOfTweets = 0;
-
 
             try {
                 QueryResult result = twitter.search(query);
@@ -122,8 +154,21 @@ public class MainActivity extends AppCompatActivity {
             goToActivity2();
         });
 
+        mClearHistoryButton = findViewById(R.id.clear_history_button);
+        mClearHistoryButton.setOnClickListener(v -> {
+//             to clear database entries, uncomment the following line
+            dbHelper.onUpgrade(database, 1, 1);
+            clearHistory = true;
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            searchQueryAdapter = new SearchQueryAdapter(this, getAllItems());
+            recyclerView.setAdapter(searchQueryAdapter);
+        });
+
+
+
 
     }
+
 
     private void goToActivity2() {
         Intent intent = new Intent(this, Main2Activity.class);
@@ -171,31 +216,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public List<HashtagAndOccurences> countNumberOfOccurrences() {
-        occurrences = new ArrayList<>();
+        occurrencesArrayList = new ArrayList<>();
         Set<String> listOfAllHashtagsWithoutDuplicates = new TreeSet<>(listOfAllHashtags);
 
         for (String s : listOfAllHashtagsWithoutDuplicates) {
-            occurrences.add(new HashtagAndOccurences(s, Collections.frequency(listOfAllHashtags, s)));
+            occurrencesArrayList.add(new HashtagAndOccurences(s, Collections.frequency(listOfAllHashtags, s)));
         }
 
         System.out.println("Alle Hhashtags in dieser Suchanfrage ist wie folgt: ");
         System.out.println(Arrays.toString(listOfAllHashtags.toArray()));
         System.out.println("Unsorted List: ");
-        System.out.println("Number of Occurrences of each item is: " + Arrays.toString(occurrences.toArray()));
+        System.out.println("Number of Occurrences of each item is: " + Arrays.toString(occurrencesArrayList.toArray()));
 
 
-        Collections.sort(occurrences, Comparator.comparing(HashtagAndOccurences::getNumberOfOccurrences)
+        Collections.sort(occurrencesArrayList, Comparator.comparing(HashtagAndOccurences::getNumberOfOccurrences)
                 .thenComparing(HashtagAndOccurences::getHashtagName).reversed());
 
         System.out.println("-----------------------------------------------------");
         System.out.println("Sorted List: ");
-        for (HashtagAndOccurences hashtagAndOccurences : occurrences) {
+        for (HashtagAndOccurences hashtagAndOccurences : occurrencesArrayList) {
             System.out.println("Hashtag: " + hashtagAndOccurences.getHashtagName() + " || number of occurs: " + hashtagAndOccurences.getNumberOfOccurrences());
         }
-        return occurrences;
+        return occurrencesArrayList;
     }
 
-    public static ArrayList<HashtagAndOccurences> getOccurrences() {
-        return occurrences;
+    public static ArrayList<HashtagAndOccurences> getOccurrencesArrayList() {
+        return occurrencesArrayList;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        listOfAllHashtags.clear();
+        occurrencesArrayList.clear();
+
+
     }
 }

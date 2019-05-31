@@ -13,16 +13,10 @@ public class HashtagAndOccurences {
         return hashtagName;
     }
 
-    public void setHashtagName(String hashtagName) {
-        this.hashtagName = hashtagName;
-    }
+
 
     public int getNumberOfOccurrences() {
         return numberOfOccurrences;
-    }
-
-    public void setNumberOfOccurrences(int numberOfOccurrences) {
-        this.numberOfOccurrences = numberOfOccurrences;
     }
 
     @Override

@@ -15,8 +15,11 @@ public class SearchQueryDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-//        db.delete(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null);
-        final String SQL_CREATE_SEARCH_QUERY_TABLE = "CREATE TABLE " +
+        /*if (MainActivity.clearHistory) {
+        db.delete(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null);
+        }*/
+
+        final String SQL_CREATE_SEARCH_QUERY_TABLE = "CREATE TABLE IF NOT EXISTS " +
                 SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME + " (" +
                 SearchQueriesDatabaseTables.SearchQueryEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 SearchQueriesDatabaseTables.SearchQueryEntry.COLUMN_NAME + " TEXT NOT NULL " +

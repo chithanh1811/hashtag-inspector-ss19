@@ -25,7 +25,6 @@ public class SearchQueryAdapter extends RecyclerView.Adapter<SearchQueryAdapter.
         public SearchQueryViewHolder(@NonNull View itemView) {
             super(itemView);
             searchText = itemView.findViewById(R.id.search_query);
-
         }
     }
 
