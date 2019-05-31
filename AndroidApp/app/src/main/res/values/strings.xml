@@ -5,4 +5,5 @@
     <string name="search_field">Enter a String</string>
     <string name="hashtag_query">Enter a Hashtag</string>
     <string name="action_search" />
+    <string name="list_of_all_popular_hashtags">Popular Hashtags</string>
 </resources>

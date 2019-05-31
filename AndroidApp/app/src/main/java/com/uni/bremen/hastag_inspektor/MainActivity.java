@@ -2,6 +2,7 @@ package com.uni.bremen.hastag_inspektor;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
@@ -50,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<String> listOfAllHashtags = new ArrayList<>();
 
+    // muss das hier deklariert werden, denn wir brauchen dies hier spaeter in unserer second-activity
+    private static ArrayList<HashtagAndOccurences> occurrences = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
                 .setOAuthAccessTokenSecret("YutFlDv8mP7GDiycmSNlvQ7wQYWCafphEjK6j6cmT4bNU");
 
 
-
         mSearchQueryEditText = findViewById(R.id.searchQueryEditText);
         searchButton = findViewById(R.id.button);
         TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
@@ -94,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         searchButton.setOnClickListener(v -> {
-
             userInput = mSearchQueryEditText.getText().toString();
             addToDb();
             System.out.println("The user has entered the following test: " + userInput);
@@ -117,10 +119,15 @@ public class MainActivity extends AppCompatActivity {
             }
             System.out.println("Number of Tweets: " + countNumberOfTweets);
             countNumberOfOccurrences();
+            goToActivity2();
         });
 
 
+    }
 
+    private void goToActivity2() {
+        Intent intent = new Intent(this, Main2Activity.class);
+        startActivity(intent);
     }
 
     private void addToDb() {
@@ -163,8 +170,8 @@ public class MainActivity extends AppCompatActivity {
         return database.query(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null, null, null, null, null);
     }
 
-    public  void countNumberOfOccurrences() {
-        ArrayList<HashtagAndOccurences> occurrences = new ArrayList<>();
+    public List<HashtagAndOccurences> countNumberOfOccurrences() {
+        occurrences = new ArrayList<>();
         Set<String> listOfAllHashtagsWithoutDuplicates = new TreeSet<>(listOfAllHashtags);
 
         for (String s : listOfAllHashtagsWithoutDuplicates) {
@@ -178,13 +185,17 @@ public class MainActivity extends AppCompatActivity {
 
 
         Collections.sort(occurrences, Comparator.comparing(HashtagAndOccurences::getNumberOfOccurrences)
-                .thenComparing(HashtagAndOccurences::getHashtagName));
+                .thenComparing(HashtagAndOccurences::getHashtagName).reversed());
 
         System.out.println("-----------------------------------------------------");
         System.out.println("Sorted List: ");
         for (HashtagAndOccurences hashtagAndOccurences : occurrences) {
             System.out.println("Hashtag: " + hashtagAndOccurences.getHashtagName() + " || number of occurs: " + hashtagAndOccurences.getNumberOfOccurrences());
         }
+        return occurrences;
+    }
 
+    public static ArrayList<HashtagAndOccurences> getOccurrences() {
+        return occurrences;
     }
 }
