@@ -20,7 +20,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <android.support.design.widget.TabLayout
-                android:id="@+id/tabLayout"
+                android:id="@+id/tab_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:tabIndicatorColor="@color/twitterWhite"
@@ -29,53 +29,27 @@
                 app:tabTextColor="#86FFFFFF">
 
                 <android.support.design.widget.TabItem
+                    android:id="@+id/tweet_tab"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="@string/tab_tweets" />
 
                 <android.support.design.widget.TabItem
+                    android:id="@+id/similar_hashtag_tab"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="@string/tab_similar_hashtags" />
-
             </android.support.design.widget.TabLayout>
         </android.support.v7.widget.Toolbar>
 
 
-
-    <RelativeLayout
-        android:id="@+id/relativeLayout"
-        android:layout_width="0dp"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar3">
-
-        <View
-            android:layout_width="wrap_content"
-            android:layout_height="1dp"
-            android:layout_alignParentBottom="true"
-            android:background="?android:attr/listDivider" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="59dp"
-            android:layout_marginBottom="-59dp"
-            android:fadeScrollbars="false"
-            android:scrollbars="vertical"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </RelativeLayout>
+        app:layout_constraintTop_toBottomOf="@+id/toolbar3" />
 
     </android.support.constraint.ConstraintLayout>
