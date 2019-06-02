@@ -1,10 +1,16 @@
 <resources>
-    <string name="app_name">Hashtag_Inspector</string>
+    <string name="app_name">Hashtag Inspector</string>
     <string name="hashtag_inspector">Hashtag Inspector</string>
     <string name="search_button">Begin the Ultimate Search</string>
     <string name="search_field">Enter a String</string>
-    <string name="hashtag_query">Enter a Hashtag</string>
+    <string name="search_hint">Search Hashtag</string>
     <string name="action_search" />
     <string name="list_of_all_popular_hashtags">Popular Hashtags</string>
     <string name="clear_history_button">Clear History</string>
+    <string name="title_explore">Explore</string>
+    <string name="title_history">History</string>
+    <string name="trending">Trending</string>
+    <string name="history">History</string>
+    <string name="tab_tweets">Tweets</string>
+    <string name="tab_similar_hashtags">Similar Hashtags</string>
 </resources>

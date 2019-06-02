@@ -15,7 +15,7 @@ public class SearchQueryDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        /*if (MainActivity.clearHistory) {
+        /*if (ExploreFragment.clearHistory) {
         db.delete(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null);
         }*/
 

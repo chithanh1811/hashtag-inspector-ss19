@@ -1,5 +1,6 @@
 package com.uni.bremen.hastag_inspektor;
 
+import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -7,17 +8,19 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.StrictMode;
-import android.os.SystemClock;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.support.annotation.NonNull;
+import android.support.design.chip.ChipGroup;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.MenuItem;
+import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -38,18 +41,16 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     // define private variable
-    // userInput as a String
+/*    // userInput as a String
     private String userInput;
     // Button
     private Button searchButton;
     // The EditText view
-    private EditText mSearchQueryEditText;
+    private EditText mSearchQueryEditText;*/
     // for Twitter4j
     private ConfigurationBuilder configurationBuilder;
-
-    private SearchQueryAdapter searchQueryAdapter;
 
     private SQLiteDatabase database;
 
@@ -58,23 +59,28 @@ public class MainActivity extends AppCompatActivity {
     // muss das hier deklariert werden, denn wir brauchen dies hier spaeter in unserer second-activity
     private static ArrayList<HashtagAndOccurences> occurrencesArrayList = new ArrayList<>();
 
-    public static boolean clearHistory = false;
-    private Button mClearHistoryButton;
+    /*public static boolean clearHistory = false;
+    private Button mClearHistoryButton;*/
+    private SearchView searchView;
+
+    // Search Query Adapter
+    public SearchQueryAdapter searchQueryAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        loadFragment(new ExploreFragment());
+
+        BottomNavigationView navigation = findViewById(R.id.nav_view);
+        navigation.setOnNavigationItemSelectedListener(MainActivity.this);
 
         SearchQueryDBHelper dbHelper = new SearchQueryDBHelper(this);
         database = dbHelper.getWritableDatabase();
         dbHelper.onCreate(database);
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         searchQueryAdapter = new SearchQueryAdapter(this, getAllItems());
-        recyclerView.setAdapter(searchQueryAdapter);
 
         // TODO: @Sajjad: have to change it later, it's a bad use-case
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -87,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-
         // @sajjad: Twitter authentication
         configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setDebugEnabled(true)
@@ -96,12 +101,63 @@ public class MainActivity extends AppCompatActivity {
                 .setOAuthAccessToken("799690696970092544-AvEdEbkruF9YDOwT28yqNZ5CxC4p6yR")
                 .setOAuthAccessTokenSecret("YutFlDv8mP7GDiycmSNlvQ7wQYWCafphEjK6j6cmT4bNU");
 
-
-        mSearchQueryEditText = findViewById(R.id.searchQueryEditText);
-        searchButton = findViewById(R.id.button);
         TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
         Twitter twitter = tf.getInstance();
 
+
+        // @Thanh: Search
+        searchView = findViewById(R.id.searchView);
+        searchView.setQueryHint("Enter a Hashtag to search");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.charAt(0) != '#') {
+                    query = "#" + query;
+                }
+                Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
+                addToDb(query);
+                searchQueryAdapter.swapCursor(getAllItems());
+                searchQueryAdapter.notifyDataSetChanged();
+                Query q = new Query(query + " -filter:retweets");
+                q.setCount(50);
+                int countNumberOfTweets = 0;
+                try {
+                    QueryResult result = twitter.search(q);
+                    for (Status status : result.getTweets()) {
+                        System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
+                        extractHashtagsFromAString(status.getText());
+                        countNumberOfTweets++;
+                    }
+                } catch (TwitterException te) {
+                    Toast.makeText(getBaseContext(), te.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                countNumberOfOccurrences();
+                Toast.makeText(getBaseContext(), "Number of Tweets: " + countNumberOfTweets, Toast.LENGTH_LONG).show();
+                Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
+                myIntent.putExtra("title", query);
+                startActivity(myIntent);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        // @Thanh: Trending Hashtags
+        /*trendRecyclerView = (RecyclerView) findViewById(R.id.trending_recyclerView_exploreFragment);
+        trendLayoutManager = new LinearLayoutManager(this);
+        trendRecyclerView.setHasFixedSize(true);
+        trendAdapter = new MyAdapter(getOccurrencesArrayList());
+
+        trendRecyclerView.setLayoutManager(trendLayoutManager);
+        trendRecyclerView.setAdapter(trendAdapter);*/
+
+
+       /* mSearchQueryEditText = findViewById(R.id.searchQueryEditText);
+        searchButton = findViewById(R.id.button);
         searchButton.setEnabled(false);
 
         mSearchQueryEditText.addTextChangedListener(new TextWatcher() {
@@ -154,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
             goToActivity2();
         });
 
+
         mClearHistoryButton = findViewById(R.id.clear_history_button);
         mClearHistoryButton.setOnClickListener(v -> {
 //             to clear database entries, uncomment the following line
@@ -162,32 +219,15 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             searchQueryAdapter = new SearchQueryAdapter(this, getAllItems());
             recyclerView.setAdapter(searchQueryAdapter);
-        });
-
-
-
+        });*/
 
     }
 
-
-    private void goToActivity2() {
-        Intent intent = new Intent(this, Main2Activity.class);
-        startActivity(intent);
-    }
-
-    private void addToDb() {
-        String name = mSearchQueryEditText.getText().toString();
+    private void addToDb(String name) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(SearchQueriesDatabaseTables.SearchQueryEntry.COLUMN_NAME, name);
-
-
         database.insert(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, contentValues);
-        searchQueryAdapter.swapCursor(getAllItems());
-
-
-        mSearchQueryEditText.getText().clear();
     }
-
 
     public void extractHashtagsFromAString(String someSampleText) {
         Pattern MY_PATTERN = Pattern.compile("#(\\w+)");
@@ -211,8 +251,9 @@ public class MainActivity extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    private Cursor getAllItems() {
-        return database.query(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null, null, null, null, null);
+    public Cursor getAllItems() {
+        Cursor newCursor = database.query(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null, null, null, null, null);
+        return newCursor;
     }
 
     public List<HashtagAndOccurences> countNumberOfOccurrences() {
@@ -250,6 +291,33 @@ public class MainActivity extends AppCompatActivity {
         listOfAllHashtags.clear();
         occurrencesArrayList.clear();
 
+    }
 
+    private boolean loadFragment(Fragment fragment) {
+        //switching fragment
+        if (fragment != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .commit();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        Fragment fragment = null;
+
+        switch (item.getItemId()) {
+            case R.id.navigation_explore:
+                fragment = new ExploreFragment();
+                break;
+
+            case R.id.navigation_history:
+                fragment = new HistoryFragment();
+                break;
+        }
+        return loadFragment(fragment);
     }
 }
