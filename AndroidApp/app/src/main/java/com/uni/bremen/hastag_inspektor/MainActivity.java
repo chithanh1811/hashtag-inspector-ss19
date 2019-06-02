@@ -1,8 +1,8 @@
 package com.uni.bremen.hastag_inspektor;
 
-import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,15 +11,14 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
-import android.support.design.chip.ChipGroup;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
-import android.widget.RelativeLayout;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -59,8 +58,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     // muss das hier deklariert werden, denn wir brauchen dies hier spaeter in unserer second-activity
     private static ArrayList<HashtagAndOccurences> occurrencesArrayList = new ArrayList<>();
 
-    /*public static boolean clearHistory = false;
-    private Button mClearHistoryButton;*/
+    public static boolean clearHistory = false;
+
     private SearchView searchView;
 
     // Search Query Adapter
@@ -146,6 +145,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             }
         });
 
+        // @Thanh: Search button
+        FloatingActionButton searchButton = findViewById(R.id.search_button);
+        searchButton.setOnClickListener(v -> {
+                searchView.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+        });
+
+        // TODO @Thanh: tap anywhere to hide the keyboard
+        //InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        //imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+
         // @Thanh: Trending Hashtags
         /*trendRecyclerView = (RecyclerView) findViewById(R.id.trending_recyclerView_exploreFragment);
         trendLayoutManager = new LinearLayoutManager(this);
@@ -208,18 +219,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             System.out.println("Number of Tweets: " + countNumberOfTweets);
             countNumberOfOccurrences();
             goToActivity2();
-        });
-
-
-        mClearHistoryButton = findViewById(R.id.clear_history_button);
-        mClearHistoryButton.setOnClickListener(v -> {
-//             to clear database entries, uncomment the following line
-            dbHelper.onUpgrade(database, 1, 1);
-            clearHistory = true;
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            searchQueryAdapter = new SearchQueryAdapter(this, getAllItems());
-            recyclerView.setAdapter(searchQueryAdapter);
         });*/
+
 
     }
 
@@ -319,5 +320,22 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 break;
         }
         return loadFragment(fragment);
+    }
+
+    public void clearHistory() {
+        new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.DeleteDialog))
+                .setMessage("Do you really want to clear search history? This cannot be undone!")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        SearchQueryDBHelper dbHelper = new SearchQueryDBHelper(MainActivity.this);
+                        dbHelper.onUpgrade(database, 1, 1);
+                        clearHistory = true;
+                        searchQueryAdapter.swapCursor(getAllItems());
+                        searchQueryAdapter.notifyDataSetChanged();
+                        Toast.makeText(MainActivity.this, "Search History Cleared!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null).show();
+
     }
 }
