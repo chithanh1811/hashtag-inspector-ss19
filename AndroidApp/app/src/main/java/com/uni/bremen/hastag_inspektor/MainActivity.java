@@ -117,21 +117,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 addToDb(query);
                 searchQueryAdapter.swapCursor(getAllItems());
                 searchQueryAdapter.notifyDataSetChanged();
-                Query q = new Query(query + " -filter:retweets");
-                q.setCount(50);
-                int countNumberOfTweets = 0;
-                try {
-                    QueryResult result = twitter.search(q);
-                    for (Status status : result.getTweets()) {
-                        System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
-                        extractHashtagsFromAString(status.getText());
-                        countNumberOfTweets++;
-                    }
-                } catch (TwitterException te) {
-                    Toast.makeText(getBaseContext(), te.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                countNumberOfOccurrences();
-                Toast.makeText(getBaseContext(), "Number of Tweets: " + countNumberOfTweets, Toast.LENGTH_LONG).show();
+                startSearch(query);
                 Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
                 myIntent.putExtra("title", query);
                 startActivity(myIntent);
@@ -336,5 +322,33 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 })
                 .setNegativeButton(android.R.string.no, null).show();
 
+    }
+
+    public void startSearch(String query){
+        configurationBuilder = new ConfigurationBuilder();
+        configurationBuilder.setDebugEnabled(true)
+                .setOAuthConsumerKey("bQJQwFuUGy7B9uPuuxJtgp7Q8")
+                .setOAuthConsumerSecret("6VMslMNhonTvkz3HR5uzE1x1kozltaPXxhZtPzRzJAIoYaOBLt")
+                .setOAuthAccessToken("799690696970092544-AvEdEbkruF9YDOwT28yqNZ5CxC4p6yR")
+                .setOAuthAccessTokenSecret("YutFlDv8mP7GDiycmSNlvQ7wQYWCafphEjK6j6cmT4bNU");
+
+        TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
+        Twitter twitter = tf.getInstance();
+        Query q = new Query(query + " -filter:retweets");
+        q.setCount(50);
+        int countNumberOfTweets = 0;
+        try {
+            QueryResult result = twitter.search(q);
+            for (Status status : result.getTweets()) {
+                System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
+                extractHashtagsFromAString(status.getText());
+                countNumberOfTweets++;
+            }
+        } catch (TwitterException te) {
+            Toast.makeText(getBaseContext(), te.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        countNumberOfOccurrences();
+        Toast.makeText(getBaseContext(), "Number of Tweets: " + countNumberOfTweets, Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
     }
 }

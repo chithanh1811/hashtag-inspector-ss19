@@ -35,12 +35,11 @@ public class SearchQueryAdapter extends RecyclerView.Adapter<SearchQueryAdapter.
             searchText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String query = mCursor.getString(mCursor.getColumnIndex(SearchQueriesDatabaseTables.SearchQueryEntry.COLUMN_NAME));
-                    // TODO @Sajjad Ich brauche noch eine Method, ein neue Anfrage (nicht von der MainActivity) zu stellen
-                    Query q = new Query(query + " -filter:retweets");
-                    Intent myIntent = new Intent(context, SearchResultsActivity.class);
+                    String query = searchText.getText().toString();
+                    ((MainActivity)context).startSearch(query);
+                    Intent myIntent = new Intent((MainActivity)context, SearchResultsActivity.class);
                     myIntent.putExtra("title", query);
-                    context.startActivity(myIntent);
+                    ((MainActivity)context).startActivity(myIntent);
                 }
             });
         }
