@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
         Twitter twitter = tf.getInstance();
 
-
         // @Thanh: Search
         searchView = findViewById(R.id.searchView);
         searchView.setQueryHint("Enter a Hashtag to search");

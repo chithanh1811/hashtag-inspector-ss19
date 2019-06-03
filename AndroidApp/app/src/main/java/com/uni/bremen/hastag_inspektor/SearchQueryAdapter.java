@@ -1,21 +1,28 @@
 package com.uni.bremen.hastag_inspektor;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import twitter4j.Query;
 
 public class SearchQueryAdapter extends RecyclerView.Adapter<SearchQueryAdapter.SearchQueryViewHolder> {
     private Context mContext;
     private Cursor mCursor;
+    private Context context;
 
     public SearchQueryAdapter(Context context, Cursor cursor) {
         mContext = context;
         mCursor = cursor;
+        this.context = context;
     }
 
     public class SearchQueryViewHolder extends RecyclerView.ViewHolder {
@@ -25,7 +32,19 @@ public class SearchQueryAdapter extends RecyclerView.Adapter<SearchQueryAdapter.
         public SearchQueryViewHolder(@NonNull View itemView) {
             super(itemView);
             searchText = itemView.findViewById(R.id.search_query);
+            searchText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String query = mCursor.getString(mCursor.getColumnIndex(SearchQueriesDatabaseTables.SearchQueryEntry.COLUMN_NAME));
+                    // TODO @Sajjad Ich brauche noch eine Method, ein neue Anfrage (nicht von der MainActivity) zu stellen
+                    Query q = new Query(query + " -filter:retweets");
+                    Intent myIntent = new Intent(context, SearchResultsActivity.class);
+                    myIntent.putExtra("title", query);
+                    context.startActivity(myIntent);
+                }
+            });
         }
+
     }
 
     @NonNull

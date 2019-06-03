@@ -10,6 +10,7 @@ import android.os.Bundle;
 public class SearchResultsActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    public static final String QUERY_ARG = "query";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
