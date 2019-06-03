@@ -12,12 +12,21 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import twitter4j.Query;
+import twitter4j.QueryResult;
+import twitter4j.Status;
+import twitter4j.TwitterException;
 
 public class SearchQueryAdapter extends RecyclerView.Adapter<SearchQueryAdapter.SearchQueryViewHolder> {
     private Context mContext;
     private Cursor mCursor;
     private Context context;
+    private ArrayList<String> listOfAllHashtags = new ArrayList<>();
 
     public SearchQueryAdapter(Context context, Cursor cursor) {
         mContext = context;
@@ -38,6 +47,17 @@ public class SearchQueryAdapter extends RecyclerView.Adapter<SearchQueryAdapter.
                     String query = mCursor.getString(mCursor.getColumnIndex(SearchQueriesDatabaseTables.SearchQueryEntry.COLUMN_NAME));
                     // TODO @Sajjad Ich brauche noch eine Method, ein neue Anfrage (nicht von der MainActivity) zu stellen
                     Query q = new Query(query + " -filter:retweets");
+                    q.setCount(50);
+                    try {
+                        QueryResult result = twitter.search(q);
+                        for (Status status : result.getTweets()) {
+                            System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
+                            extractHashtagsFromAString(status.getText());
+                            countNumberOfTweets++;
+                        }
+                    } catch (TwitterException te) {
+                        Toast.makeText(getBaseContext(), te.getMessage(), Toast.LENGTH_LONG).show();
+                    }
                     Intent myIntent = new Intent(context, SearchResultsActivity.class);
                     myIntent.putExtra("title", query);
                     context.startActivity(myIntent);
@@ -80,5 +100,19 @@ public class SearchQueryAdapter extends RecyclerView.Adapter<SearchQueryAdapter.
             notifyDataSetChanged();
 
         }
+    }
+
+    public void extractHashtagsFromAString(String someSampleText) {
+        Pattern MY_PATTERN = Pattern.compile("#(\\w+)");
+        Matcher mat = MY_PATTERN.matcher(someSampleText);
+        List<String> listOfHashtagsInTheString = new ArrayList<>();
+        while (mat.find()) {
+            listOfHashtagsInTheString.add(mat.group(1).toLowerCase());
+
+        }
+        for (String s : listOfHashtagsInTheString) {
+            System.out.println("Hashtag: " + s);
+        }
+        listOfAllHashtags.addAll(listOfHashtagsInTheString);
     }
 }
