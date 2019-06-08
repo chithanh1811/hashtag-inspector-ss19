@@ -10,10 +10,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    private ArrayList<HashtagAndOccurences> hashtagAndOccurrences;
+    private ArrayList<HashtagAndOccurrences> hashtagAndOccurrences;
 
 
-    public MyAdapter(ArrayList<HashtagAndOccurences> hashtagAndOccurrences) {
+    public MyAdapter(ArrayList<HashtagAndOccurrences> hashtagAndOccurrences) {
         this.hashtagAndOccurrences = hashtagAndOccurrences;
     }
 
@@ -26,10 +26,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
-        HashtagAndOccurences hashtagAndOccurences = this.hashtagAndOccurrences.get(i);
+        HashtagAndOccurrences hashtagAndOccurrences = this.hashtagAndOccurrences.get(i);
 
-        myViewHolder.mTextViewHashtagTitle.setText(hashtagAndOccurences.getHashtagName());
-        myViewHolder.mTextViewHashtagOccurrences.setText(String.valueOf(hashtagAndOccurences.getNumberOfOccurrences()));
+        myViewHolder.mTextViewHashtagTitle.setText(hashtagAndOccurrences.getHashtagName());
+        myViewHolder.mTextViewHashtagOccurrences.setText(String.valueOf(hashtagAndOccurrences.getNumberOfOccurrences()));
     }
 
     @Override

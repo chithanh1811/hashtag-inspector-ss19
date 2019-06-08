@@ -1,10 +1,10 @@
 package com.uni.bremen.hastag_inspektor;
 
-public class HashtagAndOccurences {
+public class HashtagAndOccurrences {
     private String hashtagName;
     private int numberOfOccurrences;
 
-    public HashtagAndOccurences(String hashtagName, int numberOfOccurrences) {
+    public HashtagAndOccurrences(String hashtagName, int numberOfOccurrences) {
         this.hashtagName = hashtagName;
         this.numberOfOccurrences = numberOfOccurrences;
     }
@@ -21,7 +21,7 @@ public class HashtagAndOccurences {
 
     @Override
     public String toString() {
-        return "HashtagAndOccurences{" +
+        return "HashtagAndOccurrences{" +
                 "hashtagName='" + hashtagName + '\'' +
                 ", numberOfOccurrences=" + numberOfOccurrences +
                 '}';

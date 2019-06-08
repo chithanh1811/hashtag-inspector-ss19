@@ -7,4 +7,7 @@
     <string name="action_search" />
     <string name="list_of_all_popular_hashtags">Popular Hashtags</string>
     <string name="clear_history_button">Clear History</string>
+    <string name="trends">Trends</string>
+    <string name="search">Search</string>
+    <string name="history">History</string>
 </resources>
