@@ -19,6 +19,7 @@ public class HistoryFragment extends Fragment {
         // History RecyclerView
         RecyclerView historyRecyclerView = view.findViewById(R.id.history_recyclerView_historyFragment);
         historyRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        historyRecyclerView.setHasFixedSize(true);
         historyRecyclerView.setAdapter(((MainActivity) getActivity()).searchQueryAdapter);
 
         // Clear History Button

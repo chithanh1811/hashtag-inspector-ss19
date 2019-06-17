@@ -23,13 +23,8 @@ public class ExploreFragment extends Fragment {
         historyRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         historyRecyclerView.setAdapter(((MainActivity)getActivity()).searchQueryAdapter);
 
-        // @Thanh: Trending Hashtags
-        RecyclerView trendRecyclerView = (RecyclerView)view.findViewById(R.id.trending_recyclerView_exploreFragment);
-        trendRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        trendRecyclerView.setHasFixedSize(true);
-        RecyclerView.Adapter trendAdapter = new MyAdapter(((MainActivity) getActivity()).getOccurrencesArrayList());
-        trendAdapter.notifyDataSetChanged();
-        trendRecyclerView.setAdapter(trendAdapter);
+        // @TODO Thanh: Trending Hashtags
+
         return view;
     }
 

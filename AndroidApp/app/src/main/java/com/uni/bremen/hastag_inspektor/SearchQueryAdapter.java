@@ -17,12 +17,10 @@ import twitter4j.Query;
 public class SearchQueryAdapter extends RecyclerView.Adapter<SearchQueryAdapter.SearchQueryViewHolder> {
     private Context mContext;
     private Cursor mCursor;
-    private Context context;
 
     public SearchQueryAdapter(Context context, Cursor cursor) {
         mContext = context;
         mCursor = cursor;
-        this.context = context;
     }
 
     public class SearchQueryViewHolder extends RecyclerView.ViewHolder {
@@ -36,10 +34,10 @@ public class SearchQueryAdapter extends RecyclerView.Adapter<SearchQueryAdapter.
                 @Override
                 public void onClick(View v) {
                     String query = searchText.getText().toString();
-                    ((MainActivity)context).startSearch(query);
-                    Intent myIntent = new Intent((MainActivity)context, SearchResultsActivity.class);
+                    ((MainActivity)mContext).startSearch(query);
+                    Intent myIntent = new Intent((MainActivity)mContext, SearchResultsActivity.class);
                     myIntent.putExtra("title", query);
-                    ((MainActivity)context).startActivity(myIntent);
+                    ((MainActivity)mContext).startActivity(myIntent);
                 }
             });
         }
