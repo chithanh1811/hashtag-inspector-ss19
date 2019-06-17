@@ -8,36 +8,37 @@
     android:tag="explore_fragment"
     tools:context=".ExploreFragment">
 
-        <RelativeLayout
-            android:id="@+id/history_chips_layout"
-            android:layout_width="match_parent"
+    <RelativeLayout
+        android:id="@+id/history_chips_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:background="?android:attr/selectableItemBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/history_textView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="56dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:padding="15dp"
+            android:text="@string/history"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/history_recyclerView_exploreFragment"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_below="@+id/history_textView"
+            android:padding="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/history_textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:padding="15dp"
-                android:text="@string/history"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <android.support.v7.widget.RecyclerView
-                android:padding="15dp"
-                android:id="@+id/history_recyclerView_exploreFragment"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_below="@+id/history_textView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/history_textView" />
-        </RelativeLayout>
+            app:layout_constraintTop_toBottomOf="@+id/history_textView" />
+    </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/trending_layout"

@@ -18,6 +18,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -133,80 +135,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         // @Thanh: Search button
         FloatingActionButton searchButton = findViewById(R.id.search_button);
         searchButton.setOnClickListener(v -> {
+            if (!checkFocusRec(searchView)) {
                 searchView.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            } else if (searchView.getQuery() != null){
+                searchView.setQuery(searchView.getQuery(), true);
+                Toast.makeText(getBaseContext(), searchView.getQuery(), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getBaseContext(), "NULL", Toast.LENGTH_LONG).show();
+            }
+
         });
 
         // TODO @Thanh: tap anywhere to hide the keyboard
-        //InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        //imm.hideSoftInputFromWindow(view.getWindowToken(),0);
-
-        // @Thanh: Trending Hashtags
-        /*trendRecyclerView = (RecyclerView) findViewById(R.id.trending_recyclerView_exploreFragment);
-        trendLayoutManager = new LinearLayoutManager(this);
-        trendRecyclerView.setHasFixedSize(true);
-        trendAdapter = new MyAdapter(getOccurrencesArrayList());
-
-        trendRecyclerView.setLayoutManager(trendLayoutManager);
-        trendRecyclerView.setAdapter(trendAdapter);*/
-
-
-       /* mSearchQueryEditText = findViewById(R.id.searchQueryEditText);
-        searchButton = findViewById(R.id.button);
-        searchButton.setEnabled(false);
-
-        mSearchQueryEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                String hashTag = mSearchQueryEditText.getText().toString().trim();
-                searchButton.setEnabled(hashTag.isEmpty());
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String hashTag = mSearchQueryEditText.getText().toString().trim();
-                searchButton.setEnabled(!hashTag.isEmpty());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String hashTag = mSearchQueryEditText.getText().toString().trim();
-                searchButton.setEnabled(!hashTag.isEmpty());
-            }
-        });
-
-
-        searchButton.setOnClickListener(v -> {
-            userInput = mSearchQueryEditText.getText().toString();
-
-            if (userInput.charAt(0) != '#') {
-                userInput = "#" + userInput;
-            }
-            addToDb();
-            System.out.println("The user has entered the following test: " + userInput);
-            System.out.println("mTextMessage.getText() is = " + mSearchQueryEditText.getText().toString());
-            Query query = new Query(userInput + " -filter:retweets");
-//            query.setLang("de");
-            query.setCount(50);
-            int countNumberOfTweets = 0;
-
-            try {
-                QueryResult result = twitter.search(query);
-                for (Status status : result.getTweets()) {
-                    System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
-                    extractHashtagsFromAString(status.getText());
-                    countNumberOfTweets++;
-                }
-            } catch (TwitterException te) {
-                System.out.println(te.getMessage());
-            }
-            System.out.println("Number of Tweets: " + countNumberOfTweets);
-            countNumberOfOccurrences();
-            goToActivity2();
-        });*/
-
-
     }
 
     private void addToDb(String name) {
@@ -350,5 +292,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         countNumberOfOccurrences();
         Toast.makeText(getBaseContext(), "Number of Tweets: " + countNumberOfTweets, Toast.LENGTH_LONG).show();
         Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
+    }
+
+    private boolean checkFocusRec(View view) {
+        if (view.isFocused())
+            return true;
+
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                if (checkFocusRec(viewGroup.getChildAt(i)))
+                    return true;
+            }
+        }
+        return false;
     }
 }
