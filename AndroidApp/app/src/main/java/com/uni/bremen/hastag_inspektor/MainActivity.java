@@ -18,10 +18,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,6 +37,7 @@ import com.uni.bremen.hastag_inspektor.MicrosoftSentimentAnalyseTool.Documents;
 import com.uni.bremen.hastag_inspektor.MicrosoftSentimentAnalyseTool.GetSentiment;
 import com.uni.bremen.hastag_inspektor.MicrosoftSentimentAnalyserParser.Example;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,6 +58,12 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
+import com.google.cloud.language.v1.Document;
+import com.google.cloud.language.v1.Document.Type;
+import com.google.cloud.language.v1.LanguageServiceClient;
+import com.google.cloud.language.v1.Sentiment;
+
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     private final String ACCESS_KEY = "66aa412852304b7697ad098c256da91f";
@@ -96,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        AndroidNetworking.initialize(getApplicationContext());
+
+
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
 
@@ -109,6 +124,25 @@ public class MainActivity extends AppCompatActivity {
         if (!isNetworkAvailable()) {
             Toast.makeText(this, "No Internet Connection Available, hence the app will not work!", Toast.LENGTH_LONG).show();
             finish();
+        }
+
+
+
+        // Instantiates a client
+        try (LanguageServiceClient language = LanguageServiceClient.create()) {
+
+            // The text to analyze
+            String text = "Hello, world!";
+            Document doc = Document.newBuilder()
+                    .setContent(text).setType(Type.PLAIN_TEXT).build();
+
+            // Detects the sentiment of the text
+            Sentiment sentiment = language.analyzeSentiment(doc).getDocumentSentiment();
+
+            System.out.printf("Text: %s%n", text);
+            System.out.printf("Sentiment: %s, %s%n", sentiment.getScore(), sentiment.getMagnitude());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
 
@@ -266,20 +300,37 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println(tweetsWithSentimentValueList.get(i));
             }
 
-            // call the Get Sentiment to send the request to microsoft
-            GetSentiment getSentiment = new GetSentiment(ACCESS_KEY, HOST, PATH);
-            try {
-                // storing the response from Microsoft in a String
-                String response = getSentiment.getTheSentiment(sentimentToolResponseFromMicrosoftDocuments);
-                // and we prettify the response from Microsoft
-                response = getSentiment.prettify(response);
-                // in this part, we are going to call the parse Sentiment Response from Microsoft
-                parseSentimentResponse(response);
-                System.out.println("Total Sentiment Value is: " + calculateSentimentValue(tweetsWithSentimentValueList));
-            } catch (Exception e) {
+            Log.d("TEST", "start");
+            try (LanguageServiceClient language = LanguageServiceClient.create()) {
+
+                // The text to analyze
+                String text = "Hello, world!";
+                Document doc = Document.newBuilder()
+                        .setContent(text).setType(Type.PLAIN_TEXT).build();
+
+                // Detects the sentiment of the text
+                Sentiment sentiment = language.analyzeSentiment(doc).getDocumentSentiment();
+
+                System.out.printf("Text: %s%n", text);
+                System.out.printf("Sentiment: %s, %s%n", sentiment.getScore(), sentiment.getMagnitude());
+            } catch (IOException e) {
                 e.printStackTrace();
-                System.exit(1);
             }
+//
+//            // call the Get Sentiment to send the request to microsoft
+//            GetSentiment getSentiment = new GetSentiment(ACCESS_KEY, HOST, PATH);
+//            try {
+//                // storing the response from Microsoft in a String
+//                String response = getSentiment.getTheSentiment(sentimentToolResponseFromMicrosoftDocuments);
+//                // and we prettify the response from Microsoft
+//                response = getSentiment.prettify(response);
+//                // in this part, we are going to call the parse Sentiment Response from Microsoft
+//                parseSentimentResponse(response);
+//                System.out.println("Total Sentiment Value is: " + calculateSentimentValue(tweetsWithSentimentValueList));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                System.exit(1);
+//            }
             countNumberOfOccurrences();
             goToActivity2();
         });
@@ -398,10 +449,9 @@ public class MainActivity extends AppCompatActivity {
     private double calculateSentimentValue(List<TweetsWithSentimentValue> tweetsWithSentimentValueList) {
         double totalSentimentValue = 0.0;
         for (int i = 0; i < tweetsWithSentimentValueList.size(); i++) {
-            if (Double.parseDouble(tweetsWithSentimentValueList.get(i).getSentimentValue()) != 0.5) {
-                totalSentimentValue += Double.parseDouble(tweetsWithSentimentValueList.get(i).getSentimentValue());
-            }
+            totalSentimentValue += Double.parseDouble(tweetsWithSentimentValueList.get(i).getSentimentValue());
         }
+
         return totalSentimentValue / tweetsWithSentimentValueList.size();
     }
 }
