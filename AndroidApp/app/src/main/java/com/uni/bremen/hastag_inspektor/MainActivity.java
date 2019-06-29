@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     // muss das hier deklariert werden, denn wir brauchen dies hier spaeter in unserer second-activity
     private static ArrayList<HashtagAndOccurences> occurrencesArrayList = new ArrayList<>();
 
+    private static ArrayList<Tweet> tweets = new ArrayList<>();
+
     public static boolean clearHistory = false;
 
     private SearchView searchView;
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         // print all the trends
                         // we can use this list later, to show the user all the trends
                         for (String s : trendsList) {
-                            System.out.println("Trends: " + s);
+                            //System.out.println("Trends: " + s);
                         }
 
                     } catch (TwitterException ex) {
@@ -242,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         }
         for (String s : listOfHashtagsInTheString) {
-            System.out.println("Hashtag: " + s);
+            //System.out.println("Hashtag: " + s);
         }
         listOfAllHashtags.addAll(listOfHashtagsInTheString);
         System.out.println("++++++---------------------------------------------------++++++++");
@@ -280,13 +282,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         System.out.println("-----------------------------------------------------");
         System.out.println("Sorted List: ");
         for (HashtagAndOccurences hashtagAndOccurences : occurrencesArrayList) {
-            System.out.println("Hashtag: " + hashtagAndOccurences.getHashtagName() + " || number of occurs: " + hashtagAndOccurences.getNumberOfOccurrences());
+            //System.out.println("Hashtag: " + hashtagAndOccurences.getHashtagName() + " || number of occurs: " + hashtagAndOccurences.getNumberOfOccurrences());
         }
         return occurrencesArrayList;
     }
 
     public static ArrayList<HashtagAndOccurences> getOccurrencesArrayList ( ) {
         return occurrencesArrayList;
+    }
+
+    public static ArrayList<Tweet> getTweets () {
+        System.out.println("Size " + tweets.size());
+        return tweets;
     }
 
     @Override
@@ -361,13 +368,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         try {
             QueryResult result = twitter.search(q);
             for (Status status : result.getTweets()) {
-                System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
+                tweets.add(new Tweet(status));
+                //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
                 extractHashtagsFromAString(status.getText());
                 countNumberOfTweets++;
             }
         } catch (TwitterException te) {
             Toast.makeText(getBaseContext(), te.getMessage(), Toast.LENGTH_LONG).show();
         }
+
+        /*
         // create a list of documents to store the response from Microsoft
         Documents sentimentToolResponseFromMicrosoftDocuments = new Documents();
         try {
@@ -416,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
-        }
+        }*/
         countNumberOfOccurrences();
         Toast.makeText(getBaseContext(), "Number of Tweets: " + countNumberOfTweets, Toast.LENGTH_LONG).show();
         Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
