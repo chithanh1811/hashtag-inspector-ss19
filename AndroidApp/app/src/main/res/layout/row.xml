@@ -13,11 +13,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:padding="15dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:text="occurence"
-        android:textAlignment="viewEnd"
-        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,18 +25,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:checked="false"
         android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
         android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
-        android:drawableEnd="@null"
-        android:drawableRight="@null"
+        android:drawablePadding="16dp"
+        android:gravity="center_vertical"
         android:maxLines="1"
-        app:layout_constraintBottom_toBottomOf="@+id/hashTagOccurrences"
-        app:layout_constraintEnd_toStartOf="@+id/hashTagOccurrences"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/hashTagOccurrences"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="hashtag" />
 
 </android.support.constraint.ConstraintLayout>

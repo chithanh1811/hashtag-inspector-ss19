@@ -87,7 +87,6 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.MyViewHolder
             mTimestamp.setText(tweets.get(position).getTimestamp().toString());
             mContent.setText(tweets.get(position).getContent());
             Picasso.get().load(tweets.get(position).getAvatar()).into(mAvatar);
-            mLink = tweets.get(position).getLink();
         }
 
     }

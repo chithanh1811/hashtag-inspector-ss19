@@ -3,28 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:tag="explore_fragment"
     tools:context=".ExploreFragment">
 
-    <RelativeLayout
-        android:id="@+id/history_chips_layout"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="52dp"
-        android:background="?android:attr/selectableItemBackground"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/history_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:padding="15dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:text="@string/history"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -32,44 +27,28 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/history_recyclerView_exploreFragment"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_below="@+id/history_textView"
-            android:padding="15dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/history_textView" />
-    </RelativeLayout>
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp">
 
-        <RelativeLayout
-            android:id="@+id/trending_layout"
+        </android.support.v7.widget.RecyclerView>
+
+        <TextView
+            android:id="@+id/trending_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/trending"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/trending_recyclerView_exploreFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/history_chips_layout">
+            android:layout_marginTop="24dp" />
 
-            <TextView
-                android:id="@+id/trending_textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:text="@string/trending"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:padding="15dp"/>
+    </LinearLayout>
 
-            <android.support.v7.widget.RecyclerView
-                android:padding="15dp"
-                android:id="@+id/trending_recyclerView_exploreFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/trending_textView"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/trending_textView" />
 
-        </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

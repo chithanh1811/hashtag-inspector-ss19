@@ -85,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     // Search Query Adapter
     public SearchQueryAdapter searchQueryAdapter;
 
+    // Trend Adapter
+    public TrendAdapter trendAdapter;
+
     // Sentiment
     private FusedLocationProviderClient client;
 
@@ -92,8 +95,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private double latitude;
 
     private ArrayList<TweetsWithSentimentValue> tweetsWithSentimentValueList = new ArrayList<>();
-
-    private ArrayList<String> trendsList;
+    private static ArrayList<String> trendsList;
 
 
     @Override
@@ -108,8 +110,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
-        loadFragment(new ExploreFragment());
-
         BottomNavigationView navigation = findViewById(R.id.nav_view);
         navigation.setOnNavigationItemSelectedListener(MainActivity.this);
 
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         dbHelper.onCreate(database);
 
         searchQueryAdapter = new SearchQueryAdapter(this, getAllItems());
-
+        trendAdapter = new TrendAdapter(this, trendsList);
         // TODO: @Sajjad: have to change it later, it's a bad use-case
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -139,6 +139,44 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
         Twitter twitter = tf.getInstance();
+
+        // Location
+        client = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess (Location location) {
+                if (location != null) {
+                    longitude = location.getLongitude();
+                    latitude = location.getLatitude();
+                    trendsList = new ArrayList<>();
+
+                    try {
+                        ResponseList<twitter4j.Location> locations;
+                        locations = twitter.getClosestTrends(new GeoLocation(latitude, longitude));
+                        int woeid = locations.get(0).getWoeid();
+                        Trends trends = twitter.getPlaceTrends(woeid);
+                        for (int i = 0; i < trends.getTrends().length; i++) {
+                            trendsList.add(trends.getTrends()[i].getName());
+                        }
+                        trendAdapter.update(trendsList);
+                        trendAdapter.notifyDataSetChanged();
+                        for (String s : trendsList) {
+                            System.out.println("Trends: " + s);
+                        }
+
+                    } catch (TwitterException ex) {
+                        System.out.println(ex.getMessage());
+                        // exit from the app, if you couldn't get the location from the user
+                        System.exit(1);
+                    }
+
+                }
+            }
+        });
 
         // @Thanh: Search
         searchView = findViewById(R.id.searchView);
@@ -170,46 +208,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             }
         });
 
-        // Location
-        client = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess (Location location) {
-                if (location != null) {
-                    longitude = location.getLongitude();
-                    latitude = location.getLatitude();
-                    trendsList = new ArrayList<>();
-
-                    try {
-                        ResponseList<twitter4j.Location> locations;
-                        locations = twitter.getClosestTrends(new GeoLocation(latitude, longitude));
-                        int woeid = locations.get(0).getWoeid();
-                        Trends trends = twitter.getPlaceTrends(woeid);
-                        for (int i = 0; i < trends.getTrends().length; i++) {
-                            trendsList.add(trends.getTrends()[i].getName());
-                        }
-
-                        // print all the trends
-                        // we can use this list later, to show the user all the trends
-                        for (String s : trendsList) {
-                            //System.out.println("Trends: " + s);
-                        }
-
-                    } catch (TwitterException ex) {
-                        System.out.println(ex.getMessage());
-                        // exit from the app, if you couldn't get the location from the user
-                        System.exit(1);
-                    }
-
-                }
-            }
-        });
-
-
         // @Thanh: Search button
         FloatingActionButton searchButton = findViewById(R.id.search_button);
         searchButton.setOnClickListener(v -> {
@@ -225,7 +223,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             }
 
         });
-
+        System.out.println("Load Fragment");
+        loadFragment(new ExploreFragment());
         // TODO @Thanh: tap anywhere to hide the keyboard
     }
 
@@ -294,6 +293,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     public static ArrayList<Tweet> getTweets () {
         System.out.println("Size " + tweets.size());
         return tweets;
+    }
+
+    public static ArrayList<String> getTrendsList ( ) {
+        return trendsList;
     }
 
     @Override

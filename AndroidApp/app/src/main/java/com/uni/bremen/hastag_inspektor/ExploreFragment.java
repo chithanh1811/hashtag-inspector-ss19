@@ -11,7 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 public class ExploreFragment extends Fragment {
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -24,6 +27,9 @@ public class ExploreFragment extends Fragment {
         historyRecyclerView.setAdapter(((MainActivity)getActivity()).searchQueryAdapter);
 
         // @TODO Thanh: Trending Hashtags
+        RecyclerView trendsRecyclerView = view.findViewById(R.id.trending_recyclerView_exploreFragment);
+        trendsRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        trendsRecyclerView.setAdapter(((MainActivity)getActivity()).trendAdapter);
 
         return view;
     }
