@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private ArrayList<TweetsWithSentimentValue> tweetsWithSentimentValueList = new ArrayList<>();
     private static ArrayList<String> trendsList;
 
-
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         final String CONSUMER_KEY = "bQJQwFuUGy7B9uPuuxJtgp7Q8";
@@ -288,21 +287,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         listOfAllHashtags.clear();
         occurrencesArrayList.clear();
 
-        Intent intent = getIntent(); // Point 1
-        Bundle bundle = intent.getExtras(); // Point 2
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
 
         if (bundle != null) {
-            String query = bundle.getString("title"); // Point 3
+            String query = bundle.getString("title");
             System.out.println(query);
             if (query.charAt(0) != '#') {
                 query = "#" + query;
             }
             intent.removeExtra("title");
-            startSearch(query);
-
             Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
             myIntent.putExtra("title", query);
             startActivity(myIntent);
+            startSearch(query);
+            this.finish();
         }
     }
 
@@ -380,7 +379,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             QueryResult result = twitter.search(q);
             for (Status status : result.getTweets()) {
                 tweets.add(new Tweet(status));
-                //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
                 extractHashtagsFromAString(status.getText());
                 countNumberOfTweets++;
             }

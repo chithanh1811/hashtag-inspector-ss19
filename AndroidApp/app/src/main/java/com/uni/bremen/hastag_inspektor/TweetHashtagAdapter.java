@@ -63,7 +63,7 @@ public class TweetHashtagAdapter extends RecyclerView.Adapter<TweetHashtagAdapte
             mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick (View v) {
-                    String query = mButton.getText().toString();
+                    String query = hashtagList.get(getAdapterPosition());
                     Intent intent = new Intent(context, MainActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putString("title", query);

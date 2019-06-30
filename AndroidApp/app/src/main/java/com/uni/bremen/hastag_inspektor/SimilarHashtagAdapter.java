@@ -1,13 +1,17 @@
 package com.uni.bremen.hastag_inspektor;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckedTextView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,6 +22,8 @@ public class SimilarHashtagAdapter extends RecyclerView.Adapter<SimilarHashtagAd
     public SparseBooleanArray itemStateArray = new SparseBooleanArray();
     private ArrayList<String> clickedItems = new ArrayList<String>();
     private OnItemClickListener listener;
+    private ImageButton mButton;
+    private Context context;
 
     public interface OnItemClickListener {
         void onClick(ArrayList<String> clickedItems);
@@ -34,7 +40,7 @@ public class SimilarHashtagAdapter extends RecyclerView.Adapter<SimilarHashtagAd
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        Context context = parent.getContext();
+        context = parent.getContext();
         int layoutForItem = R.layout.row;
         LayoutInflater inflater = LayoutInflater.from(context);
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row, parent, false);
@@ -61,6 +67,20 @@ public class SimilarHashtagAdapter extends RecyclerView.Adapter<SimilarHashtagAd
             mCheckedTextView = (CheckedTextView) itemView.findViewById(R.id.checked_text_view);
             mTextViewHashtagOccurrences = v.findViewById(R.id.hashTagOccurrences);
             itemView.setOnClickListener(this);
+
+            mButton = itemView.findViewById(R.id.imageButton);
+            mButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick (View v) {
+                    String query = mCheckedTextView.getText().toString();
+                    Intent intent = new Intent(context, MainActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", query);
+                    intent.putExtras(bundle);
+                    context.startActivity(intent);
+                    ((SearchResultsActivity)context).finish();
+                }
+            });
         }
 
         @Override

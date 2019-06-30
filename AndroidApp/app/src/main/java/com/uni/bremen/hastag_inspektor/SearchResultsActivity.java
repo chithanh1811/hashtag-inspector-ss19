@@ -34,8 +34,6 @@ public class SearchResultsActivity extends AppCompatActivity {
     }
     @Override
     public boolean onSupportNavigateUp(){
-        getIntent().replaceExtras(new Bundle());
-        System.out.println("Intent cleared");
         finish();
         return true;
     }
