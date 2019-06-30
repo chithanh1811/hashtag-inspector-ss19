@@ -12,29 +12,53 @@
         android:id="@+id/hashTagOccurrences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="24dp"
         android:layout_marginBottom="8dp"
         android:text="occurence"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/checked_text_view"
+        app:layout_constraintTop_toTopOf="@+id/checked_text_view"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/sentiment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:text="sentiment"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <CheckedTextView
         android:id="@+id/checked_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
         android:checked="false"
         android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
         android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
         android:drawablePadding="16dp"
-        android:gravity="center_vertical"
         android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="hashtag" />
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_search_grey_24dp"
+        android:background="@drawable/symbolbuttonshape"/>
 
 </android.support.constraint.ConstraintLayout>

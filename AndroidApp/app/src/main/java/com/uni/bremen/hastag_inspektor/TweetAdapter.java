@@ -4,35 +4,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckedTextView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
 public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.MyViewHolder> {
     public ArrayList<Tweet> tweets;
-    public SparseBooleanArray itemStateArray = new SparseBooleanArray();
-    private ArrayList<String> clickedItems = new ArrayList<String>();
-    private SimilarHashtagAdapter.OnItemClickListener listener;
     public Context context;
-
-    public interface OnItemClickListener {
-        void onClick(ArrayList<String> clickedItems);
-    }
-
-    public void setOnItemClickListener (SimilarHashtagAdapter.OnItemClickListener listener){
-        this.listener = listener;
-    }
 
     public TweetAdapter(ArrayList<Tweet> tweets) {
         this.tweets = new ArrayList<>();
@@ -67,26 +56,39 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.MyViewHolder
         TextView mContent;
         ImageView mAvatar;
         String mLink;
+        RecyclerView hashtagRecyclerView;
+        View v;
 
         MyViewHolder(View v) {
             super(v);
+            this.v = v;
             mUsername = (TextView) v.findViewById(R.id.tweet_username);
             mTimestamp = (TextView) v.findViewById(R.id.tweet_timestamp);
             mContent = (TextView) v.findViewById(R.id.tweet_content);
             mAvatar = (ImageView) v.findViewById(R.id.tweet_avatar);
+            hashtagRecyclerView = v.findViewById(R.id.tweethashtag_recyclerView);
+
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick (View v) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mLink));
+                    context.startActivity(browserIntent);
+                }
+            });
         }
 
         @Override
         public void onClick(View v) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mLink));
-            context.startActivity(browserIntent);
         }
 
         void bind(int position) {
             mUsername.setText(tweets.get(position).getAccount());
             mTimestamp.setText(tweets.get(position).getTimestamp().toString());
             mContent.setText(tweets.get(position).getContent());
-            Picasso.get().load(tweets.get(position).getAvatar()).into(mAvatar);
+            Picasso.get().load(tweets.get(position).getAvatar()).transform(new CircleTransform()).into(mAvatar);
+            mLink = tweets.get(position).getLink();
+            hashtagRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            hashtagRecyclerView.setAdapter(new TweetHashtagAdapter(context, tweets.get(position).getHashtagList()));
         }
 
     }

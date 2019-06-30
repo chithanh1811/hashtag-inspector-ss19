@@ -21,12 +21,11 @@ public class ExploreFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_explore, null);
 
         // History
-        // TODO @Thanh Populating a ChipGroup instead of a List
         RecyclerView historyRecyclerView  = view.findViewById(R.id.history_recyclerView_exploreFragment);
-        historyRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        historyRecyclerView.setAdapter(((MainActivity)getActivity()).searchQueryAdapter);
+        historyRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        historyRecyclerView.setAdapter(((MainActivity)getActivity()).historyAdapter);
 
-        // @TODO Thanh: Trending Hashtags
+        // Trends
         RecyclerView trendsRecyclerView = view.findViewById(R.id.trending_recyclerView_exploreFragment);
         trendsRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         trendsRecyclerView.setAdapter(((MainActivity)getActivity()).trendAdapter);

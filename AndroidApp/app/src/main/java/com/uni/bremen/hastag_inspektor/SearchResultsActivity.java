@@ -30,6 +30,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                 tabLayout.setupWithViewPager(viewPager);
             }
         });
+        getSupportActionBar().setElevation(0);
     }
     @Override
     public boolean onSupportNavigateUp(){

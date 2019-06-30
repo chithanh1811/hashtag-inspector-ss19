@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="56dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="88dp"
+        android:layout_marginBottom="32dp"
         android:clickable="true"
         android:elevation="6dp"
         android:focusable="true"

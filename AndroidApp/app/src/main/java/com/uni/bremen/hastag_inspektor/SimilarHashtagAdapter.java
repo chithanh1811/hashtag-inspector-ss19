@@ -86,7 +86,7 @@ public class SimilarHashtagAdapter extends RecyclerView.Adapter<SimilarHashtagAd
                 mCheckedTextView.setChecked(true);
             }
             mCheckedTextView.setText(hashtagAndOccurrences.get(position).getHashtagName());
-            mTextViewHashtagOccurrences.setText(String.valueOf(hashtagAndOccurrences.get(position).getNumberOfOccurrences()));
+            mTextViewHashtagOccurrences.setText(String.valueOf(hashtagAndOccurrences.get(position).getNumberOfOccurrences()) + " occurrences");
         }
 
     }

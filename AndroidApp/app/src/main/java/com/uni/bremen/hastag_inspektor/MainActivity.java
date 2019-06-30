@@ -62,7 +62,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     // Microsoft Sentiment
-    private final String ACCESS_KEY = "163c1ad42fe74033bf2ff74365ac939e";
+    private final String ACCESS_KEY = "a860e30cb3834a23a9c4a071988df408";
     private final String HOST = "https://westcentralus.api.cognitive.microsoft.com";
     private final String PATH = "/text/analytics/v2.1/sentiment";
 
@@ -84,7 +84,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     // Search Query Adapter
     public SearchQueryAdapter searchQueryAdapter;
-
+    // History Chip Groups Adapter
+    public HistoryAdapter historyAdapter;
     // Trend Adapter
     public TrendAdapter trendAdapter;
 
@@ -118,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         dbHelper.onCreate(database);
 
         searchQueryAdapter = new SearchQueryAdapter(this, getAllItems());
+        historyAdapter = new HistoryAdapter(this, getAllItems());
+
         trendAdapter = new TrendAdapter(this, trendsList);
         // TODO: @Sajjad: have to change it later, it's a bad use-case
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -160,13 +163,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         int woeid = locations.get(0).getWoeid();
                         Trends trends = twitter.getPlaceTrends(woeid);
                         for (int i = 0; i < trends.getTrends().length; i++) {
-                            trendsList.add(trends.getTrends()[i].getName());
+                            if (trends.getTrends()[i].getName().charAt(0) == '#') {
+                                trendsList.add(trends.getTrends()[i].getName());
+                            }
                         }
                         trendAdapter.update(trendsList);
                         trendAdapter.notifyDataSetChanged();
-                        for (String s : trendsList) {
-                            System.out.println("Trends: " + s);
-                        }
 
                     } catch (TwitterException ex) {
                         System.out.println(ex.getMessage());
@@ -191,11 +193,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 if (query.charAt(0) != '#') {
                     query = "#" + query;
                 }
-                Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
-                addToDb(query);
-                searchQueryAdapter.swapCursor(getAllItems());
-                searchQueryAdapter.notifyDataSetChanged();
                 startSearch(query);
+
                 Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
                 myIntent.putExtra("title", query);
                 startActivity(myIntent);
@@ -217,21 +216,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
             } else if (searchView.getQuery() != null) {
                 searchView.setQuery(searchView.getQuery(), true);
-                Toast.makeText(getBaseContext(), searchView.getQuery(), Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(getBaseContext(), "NULL", Toast.LENGTH_LONG).show();
             }
 
         });
-        System.out.println("Load Fragment");
+
         loadFragment(new ExploreFragment());
-        // TODO @Thanh: tap anywhere to hide the keyboard
     }
 
     private void addToDb (String name) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(SearchQueriesDatabaseTables.SearchQueryEntry.COLUMN_NAME, name);
         database.insert(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, contentValues);
+        searchQueryAdapter.notifyDataSetChanged();
     }
 
     public void extractHashtagsFromAString (String someSampleText) {
@@ -345,6 +343,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         clearHistory = true;
                         searchQueryAdapter.swapCursor(getAllItems());
                         searchQueryAdapter.notifyDataSetChanged();
+                        historyAdapter.swapCursor(getAllItems());
+                        historyAdapter.notifyDataSetChanged();
                         Toast.makeText(MainActivity.this, "Search History Cleared!", Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -353,6 +353,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public void startSearch (String query) {
+        addToDb(query);
         configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setDebugEnabled(true)
                 .setOAuthConsumerKey("bQJQwFuUGy7B9uPuuxJtgp7Q8")
@@ -367,7 +368,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         q.setLang("en");
         q.setCount(50);
 
+        searchQueryAdapter.swapCursor(getAllItems());
+        searchQueryAdapter.notifyDataSetChanged();
+        historyAdapter.swapCursor(getAllItems());
+        historyAdapter.notifyDataSetChanged();
+
         int countNumberOfTweets = 0;
+        tweets = new ArrayList<>();
         try {
             QueryResult result = twitter.search(q);
             for (Status status : result.getTweets()) {
