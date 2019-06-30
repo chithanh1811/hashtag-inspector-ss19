@@ -3,6 +3,7 @@ package com.uni.bremen.hastag_inspektor;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.service.autofill.TextValueSanitizer;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -57,6 +60,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.MyViewHolder
         ImageView mAvatar;
         String mLink;
         RecyclerView hashtagRecyclerView;
+        TextView mSentiment;
         View v;
 
         MyViewHolder(View v) {
@@ -67,6 +71,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.MyViewHolder
             mContent = (TextView) v.findViewById(R.id.tweet_content);
             mAvatar = (ImageView) v.findViewById(R.id.tweet_avatar);
             hashtagRecyclerView = v.findViewById(R.id.tweethashtag_recyclerView);
+            mSentiment = (TextView) v.findViewById(R.id.sentiment);
 
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -89,6 +94,12 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.MyViewHolder
             mLink = tweets.get(position).getLink();
             hashtagRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             hashtagRecyclerView.setAdapter(new TweetHashtagAdapter(context, tweets.get(position).getHashtagList()));
+            if (Float.parseFloat(tweets.get(position).getSentiment()) > 0.5)
+                mSentiment.setText("Positive (" + tweets.get(position).getSentiment() + ")");
+            else if (Float.parseFloat(tweets.get(position).getSentiment()) == 0.5)
+                mSentiment.setText("Neutral (" + tweets.get(position).getSentiment() + ")");
+            else
+                mSentiment.setText("Negative (" + tweets.get(position).getSentiment() + ")");
         }
 
     }

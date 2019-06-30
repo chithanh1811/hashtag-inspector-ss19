@@ -4,6 +4,7 @@ public class HashtagAndOccurences {
     private String hashtagName;
     private int numberOfOccurrences;
 
+
     public HashtagAndOccurences(String hashtagName, int numberOfOccurrences) {
         this.hashtagName = hashtagName;
         this.numberOfOccurrences = numberOfOccurrences;

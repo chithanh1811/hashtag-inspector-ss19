@@ -94,8 +94,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private double longitude;
     private double latitude;
-
-    private ArrayList<TweetsWithSentimentValue> tweetsWithSentimentValueList = new ArrayList<>();
+    
     private static ArrayList<String> trendsList;
 
     @Override
@@ -187,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             @Override
             public boolean onQueryTextSubmit (String query) {
                 // every time the user clicks on the search button, we must clear the list
-                tweetsWithSentimentValueList.clear();
+                tweets.clear();
 
                 if (query.charAt(0) != '#') {
                     query = "#" + query;
@@ -367,26 +366,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         q.setLocale("en");
         q.setLang("en");
         q.setCount(50);
-
-        searchQueryAdapter.swapCursor(getAllItems());
-        searchQueryAdapter.notifyDataSetChanged();
-        historyAdapter.swapCursor(getAllItems());
-        historyAdapter.notifyDataSetChanged();
-
-        int countNumberOfTweets = 0;
         tweets = new ArrayList<>();
-        try {
-            QueryResult result = twitter.search(q);
-            for (Status status : result.getTweets()) {
-                tweets.add(new Tweet(status));
-                extractHashtagsFromAString(status.getText());
-                countNumberOfTweets++;
-            }
-        } catch (TwitterException te) {
-            Toast.makeText(getBaseContext(), te.getMessage(), Toast.LENGTH_LONG).show();
-        }
-
-        /*
         // create a list of documents to store the response from Microsoft
         Documents sentimentToolResponseFromMicrosoftDocuments = new Documents();
         try {
@@ -402,24 +382,23 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 // to be sent to Microsoft
                 sentimentToolResponseFromMicrosoftDocuments.add(randomUUID, "en", status.getText());
 
-                // even though the TweetsWithSentimentValue has 6 fields
+                // even though the tweet has 6 fields
                 // on the constructor we call only 5 of them
                 // because the sentiment score we get later
-                tweetsWithSentimentValueList.add(
-                        new TweetsWithSentimentValue(status.getUser().getScreenName(),
-                                status.getUser().getName(),
-                                status.getId(),
-                                status.getText(),
-                                randomUUID)
-                );
+                tweets.add(new Tweet(status, randomUUID));
             }
         } catch (TwitterException te) {
             te.printStackTrace();
         }
 
+        searchQueryAdapter.swapCursor(getAllItems());
+        searchQueryAdapter.notifyDataSetChanged();
+        historyAdapter.swapCursor(getAllItems());
+        historyAdapter.notifyDataSetChanged();
+
         // TODO: delete later, only for debugging purposes
-        for (int i = 0; i < tweetsWithSentimentValueList.size(); i++) {
-            System.out.println(tweetsWithSentimentValueList.get(i));
+        for (int i = 0; i < tweets.size(); i++) {
+            System.out.println(tweets.get(i));
         }
 
         // call the Get Sentiment to send the request to microsoft
@@ -431,13 +410,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             response = getSentiment.prettify(response);
             // in this part, we are going to call the parse Sentiment Response from Microsoft
             parseSentimentResponse(response);
-            System.out.println("Total Sentiment Value is: " + calculateSentimentValue(tweetsWithSentimentValueList));
+            System.out.println("Total Sentiment Value is: " + calculateSentimentValue(tweets));
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
-        }*/
+        }
         countNumberOfOccurrences();
-        Toast.makeText(getBaseContext(), "Number of Tweets: " + countNumberOfTweets, Toast.LENGTH_LONG).show();
         Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
     }
 
@@ -462,32 +440,32 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         System.out.println(json);
         Example[] data = gson.fromJson(json, Example[].class);
         for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < tweetsWithSentimentValueList.size(); j++) {
-                if (tweetsWithSentimentValueList.get(j).getRandomUUID().equals(data[j].getId())) {
-                    tweetsWithSentimentValueList.get(i).setSentimentValue(
+            for (int j = 0; j < tweets.size(); j++) {
+                if (tweets.get(j).getUUID().equals(data[j].getId())) {
+                    tweets.get(i).setSentiment(
                             String.valueOf(data[i].getScore())
                     );
                     break;
                 }
             }
         }
-        for (TweetsWithSentimentValue tweetsWithSentimentValue : tweetsWithSentimentValueList) {
+        for (Tweet tweet : tweets) {
             System.out.println(
                     "Sentiment value for UUID: "
-                            + tweetsWithSentimentValue.getRandomUUID()
+                            + tweet.getUUID()
                             + "is: "
-                            + tweetsWithSentimentValue.getSentimentValue());
+                            + tweet.getSentiment());
         }
     }
 
-    private double calculateSentimentValue (List<TweetsWithSentimentValue> tweetsWithSentimentValueList) {
+    private double calculateSentimentValue (List<Tweet> tweets) {
         double totalSentimentValue = 0.0;
-        for (int i = 0; i < tweetsWithSentimentValueList.size(); i++) {
-            if (Double.parseDouble(tweetsWithSentimentValueList.get(i).getSentimentValue()) != 0.5) {
-                totalSentimentValue += Double.parseDouble(tweetsWithSentimentValueList.get(i).getSentimentValue());
+        for (int i = 0; i < tweets.size(); i++) {
+            if (Double.parseDouble(tweets.get(i).getSentiment()) != 0.5) {
+                totalSentimentValue += Double.parseDouble(tweets.get(i).getSentiment());
             }
         }
-        return totalSentimentValue / tweetsWithSentimentValueList.size();
+        return totalSentimentValue / tweets.size();
     }
 
 }

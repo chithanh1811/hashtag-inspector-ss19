@@ -6,10 +6,14 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class SearchResultsActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private TextView sentiment;
     public static final String QUERY_ARG = "query";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +34,26 @@ public class SearchResultsActivity extends AppCompatActivity {
                 tabLayout.setupWithViewPager(viewPager);
             }
         });
+
+        ArrayList<Tweet> tweets = MainActivity.getTweets();
+        float sum = 0;
+        for (Tweet tweet : tweets) {
+            sum += Float.parseFloat(tweet.getSentiment());
+        }
+        float avg = sum/tweets.size();
+        sentiment = findViewById(R.id.sentimentBar);
+
+        if (avg > 0.5){
+            sentiment.setText("Positive (" + avg + ")");
+            sentiment.setBackgroundColor(getResources().getColor(R.color.green));
+        }
+        else if (avg == 0.5){
+            sentiment.setText("Neutral (" + avg + ")");}
+        else{
+            sentiment.setText("Negative (" + avg + ")");
+            sentiment.setBackgroundColor(getResources().getColor(R.color.colorWarning));
+        }
+
         getSupportActionBar().setElevation(0);
     }
     @Override

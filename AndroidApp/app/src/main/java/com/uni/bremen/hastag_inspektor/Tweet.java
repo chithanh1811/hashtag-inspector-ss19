@@ -14,8 +14,10 @@ public class Tweet {
     private Date timestamp;
     private String link;
     private ArrayList<String> hashtagList = new ArrayList<String>();
+    private String sentiment;
+    private String UUID;
 
-    public Tweet (Status s) {
+    public Tweet (Status s, String UUID) {
         this.account = "@" + s.getUser().getScreenName();
         this.content = s.getText();
         this.avatar = s.getUser().get400x400ProfileImageURLHttps();
@@ -27,9 +29,9 @@ public class Tweet {
         while (mat.find()) {
             hashtagList.add(mat.group(1).toLowerCase());
         }
-
-
+        this.UUID = UUID;
     }
+
     public String getLink ( ) {
         return link;
     }
@@ -71,6 +73,26 @@ public class Tweet {
 
     public ArrayList<String> getHashtagList ( ) {
         return hashtagList;
+    }
+
+    public void setLink (String link) {
+        this.link = link;
+    }
+
+    public String getSentiment ( ) {
+        return sentiment;
+    }
+
+    public void setSentiment (String sentiment) {
+        this.sentiment = sentiment;
+    }
+
+    public String getUUID ( ) {
+        return UUID;
+    }
+
+    public void setUUID (String UUID) {
+        this.UUID = UUID;
     }
 }
 
