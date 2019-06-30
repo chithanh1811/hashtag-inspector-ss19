@@ -2,6 +2,7 @@ package com.uni.bremen.hastag_inspektor;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,16 +16,8 @@ import java.util.ArrayList;
 
 public class TweetHashtagAdapter extends RecyclerView.Adapter<TweetHashtagAdapter.MyViewHolder> {
     private ArrayList<String> hashtagList;
-    private TweetHashtagAdapter.OnItemClickListener listener;
     private Context context;
-
-    public interface OnItemClickListener {
-        void onClick (ArrayList<String> clickedItems);
-    }
-
-    public void setOnItemClickListener (TweetHashtagAdapter.OnItemClickListener listener) {
-        this.listener = listener;
-    }
+    private Button mButton;
 
     public TweetHashtagAdapter (Context context, ArrayList<String> hashtagList) {
         this.context = context;
@@ -34,7 +27,6 @@ public class TweetHashtagAdapter extends RecyclerView.Adapter<TweetHashtagAdapte
     @NonNull
     @Override
     public TweetHashtagAdapter.MyViewHolder onCreateViewHolder (@NonNull ViewGroup parent, int i) {
-        Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.chipbutton, parent, false);
         return new TweetHashtagAdapter.MyViewHolder(view);
@@ -42,7 +34,7 @@ public class TweetHashtagAdapter extends RecyclerView.Adapter<TweetHashtagAdapte
 
     @Override
     public void onBindViewHolder (TweetHashtagAdapter.MyViewHolder holder, int position) {
-        holder.bind(position);
+        mButton.setText("#" + hashtagList.get(position));
     }
 
     @Override
@@ -65,20 +57,19 @@ public class TweetHashtagAdapter extends RecyclerView.Adapter<TweetHashtagAdapte
 
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        Button mButton;
-
         MyViewHolder (View v) {
             super(v);
-            mButton = v.findViewById(R.id.hashtag);
-            v.setOnClickListener(new View.OnClickListener() {
+            mButton = itemView.findViewById(R.id.hashtag);
+            mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick (View v) {
                     String query = mButton.getText().toString();
-                    Toast.makeText(context, query, Toast.LENGTH_LONG).show();
-                    ((MainActivity) context).startSearch(query);
-                    Intent myIntent = new Intent((MainActivity) context, SearchResultsActivity.class);
-                    myIntent.putExtra("title", query);
-                    context.startActivity(myIntent);
+                    Intent intent = new Intent(context, MainActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", query);
+                    intent.putExtras(bundle);
+                    context.startActivity(intent);
+                    ((SearchResultsActivity)context).finish();
                 }
             });
         }
@@ -88,9 +79,6 @@ public class TweetHashtagAdapter extends RecyclerView.Adapter<TweetHashtagAdapte
 
         }
 
-        void bind (int position) {
-            mButton.setText("#" + hashtagList.get(position));
-        }
 
     }
 }

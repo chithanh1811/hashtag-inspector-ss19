@@ -32,4 +32,5 @@ public class TweetFragment extends Fragment {
         tweetRecyclerView.setAdapter(tweetAdapter);
         return view;
     }
+
 }

@@ -240,11 +240,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             listOfHashtagsInTheString.add(mat.group(1).toLowerCase());
 
         }
-        for (String s : listOfHashtagsInTheString) {
-            //System.out.println("Hashtag: " + s);
-        }
         listOfAllHashtags.addAll(listOfHashtagsInTheString);
-        System.out.println("++++++---------------------------------------------------++++++++");
     }
 
     private boolean isNetworkAvailable ( ) {
@@ -267,20 +263,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             occurrencesArrayList.add(new HashtagAndOccurences(s, Collections.frequency(listOfAllHashtags, s)));
         }
 
-        System.out.println("Alle Hhashtags in dieser Suchanfrage ist wie folgt: ");
-        System.out.println(Arrays.toString(listOfAllHashtags.toArray()));
-        System.out.println("Unsorted List: ");
-        System.out.println("Number of Occurrences of each item is: " + Arrays.toString(occurrencesArrayList.toArray()));
-
-
         Collections.sort(occurrencesArrayList, Comparator.comparing(HashtagAndOccurences::getNumberOfOccurrences)
                 .thenComparing(HashtagAndOccurences::getHashtagName).reversed());
 
-        System.out.println("-----------------------------------------------------");
-        System.out.println("Sorted List: ");
-        for (HashtagAndOccurences hashtagAndOccurences : occurrencesArrayList) {
-            //System.out.println("Hashtag: " + hashtagAndOccurences.getHashtagName() + " || number of occurs: " + hashtagAndOccurences.getNumberOfOccurrences());
-        }
         return occurrencesArrayList;
     }
 
@@ -289,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public static ArrayList<Tweet> getTweets () {
-        System.out.println("Size " + tweets.size());
         return tweets;
     }
 
@@ -300,9 +284,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onResume ( ) {
         super.onResume();
+
         listOfAllHashtags.clear();
         occurrencesArrayList.clear();
 
+        Intent intent = getIntent(); // Point 1
+        Bundle bundle = intent.getExtras(); // Point 2
+
+        if (bundle != null) {
+            String query = bundle.getString("title"); // Point 3
+            System.out.println(query);
+            if (query.charAt(0) != '#') {
+                query = "#" + query;
+            }
+            intent.removeExtra("title");
+            startSearch(query);
+
+            Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
+            myIntent.putExtra("title", query);
+            startActivity(myIntent);
+        }
     }
 
     private boolean loadFragment (Fragment fragment) {
