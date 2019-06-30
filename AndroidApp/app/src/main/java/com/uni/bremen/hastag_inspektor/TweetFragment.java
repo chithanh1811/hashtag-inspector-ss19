@@ -23,7 +23,7 @@ public class TweetFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tweet, container, false);
-
+        System.out.println("TweetFragment");
         tweetRecyclerView = view.findViewById(R.id.tweet_recyclerView);
         tweetLayoutManager = new LinearLayoutManager(this.getActivity());
         tweetRecyclerView.setHasFixedSize(true);

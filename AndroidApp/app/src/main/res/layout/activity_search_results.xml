@@ -58,7 +58,7 @@
         android:id="@+id/sentimentBar"
         android:layout_width="match_parent"
         android:layout_height="32dp"
-        android:background="@color/twitterBlue"
+        android:background="@color/twitterDarkGrey"
         android:gravity="center"
         android:text="Sentiment Value"
         android:textColor="@color/twitterWhite"

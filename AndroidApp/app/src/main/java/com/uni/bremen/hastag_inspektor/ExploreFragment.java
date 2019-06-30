@@ -19,7 +19,6 @@ public class ExploreFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_explore, null);
-
         // History
         RecyclerView historyRecyclerView  = view.findViewById(R.id.history_recyclerView_exploreFragment);
         historyRecyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity(), LinearLayoutManager.HORIZONTAL, false));

@@ -19,6 +19,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        System.out.println("SearchResultsActivity");
 
         setTitle(intent.getStringExtra("title"));
         setContentView(R.layout.activity_search_results);
@@ -45,10 +46,11 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         if (avg > 0.5){
             sentiment.setText("Positive (" + avg + ")");
-            sentiment.setBackgroundColor(getResources().getColor(R.color.green));
+            sentiment.setBackgroundColor(getResources().getColor(R.color.twitterBlue));
         }
         else if (avg == 0.5){
-            sentiment.setText("Neutral (" + avg + ")");}
+            sentiment.setText("Neutral (" + avg + ")");
+        }
         else{
             sentiment.setText("Negative (" + avg + ")");
             sentiment.setBackgroundColor(getResources().getColor(R.color.colorWarning));
