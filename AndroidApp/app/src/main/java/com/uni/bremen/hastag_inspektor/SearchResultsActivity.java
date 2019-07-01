@@ -49,14 +49,16 @@ public class SearchResultsActivity extends AppCompatActivity {
             sentiment = findViewById(R.id.sentimentBar);
             if (avg == 0){
                 sentiment.setText("N/A");
+                sentiment.setBackgroundColor(getResources().getColor(R.color.twitterDarkGrey));
             }
-            else if (avg > 0.5) {
+            else if (avg >= 0.55) {
                 sentiment.setText("Positive (" + avg + ")");
                 sentiment.setBackgroundColor(getResources().getColor(R.color.twitterBlue));
-            } else if (avg == 0.5) {
+            } else if (avg >= 0.5 && avg < 0.55) {
                 sentiment.setText("Neutral (" + avg + ")");
+                sentiment.setBackgroundColor(getResources().getColor(R.color.twitterDarkGrey));
             } else {
-                sentiment.setText("Negative (" + avg + ")");
+                sentiment.setText("Controversial (" + avg + ")");
                 sentiment.setBackgroundColor(getResources().getColor(R.color.colorWarning));
             }
         }
