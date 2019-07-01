@@ -290,16 +290,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         if (bundle != null) {
             String query = bundle.getString("title");
-            System.out.println(query);
-            if (query.charAt(0) != '#') {
-                query = "#" + query;
+            if (query != null) {
+                System.out.println(query);
+                if (query.charAt(0) != '#') {
+                    query = "#" + query;
+                }
+                intent.removeExtra("title");
+                Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
+                myIntent.putExtra("title", query);
+                startActivity(myIntent);
+                startSearch(query);
+                this.finish();
             }
-            intent.removeExtra("title");
-            Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
-            myIntent.putExtra("title", query);
-            startActivity(myIntent);
-            startSearch(query);
-            this.finish();
         }
     }
 
