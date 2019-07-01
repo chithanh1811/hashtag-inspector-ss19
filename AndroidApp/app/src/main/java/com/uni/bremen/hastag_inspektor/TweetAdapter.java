@@ -94,12 +94,18 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.MyViewHolder
             mLink = tweets.get(position).getLink();
             hashtagRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             hashtagRecyclerView.setAdapter(new TweetHashtagAdapter(context, tweets.get(position).getHashtagList()));
-            if (Float.parseFloat(tweets.get(position).getSentiment()) > 0.5)
-                mSentiment.setText("Positive (" + tweets.get(position).getSentiment() + ")");
-            else if (Float.parseFloat(tweets.get(position).getSentiment()) == 0.5)
-                mSentiment.setText("Neutral (" + tweets.get(position).getSentiment() + ")");
-            else
-                mSentiment.setText("Negative (" + tweets.get(position).getSentiment() + ")");
+            if (tweets.get(position).getSentiment() != null && !tweets.get(position).getSentiment().isEmpty()) {
+                if (Float.parseFloat(tweets.get(position).getSentiment()) > 0.5)
+                    mSentiment.setText("Positive (" + tweets.get(position).getSentiment() + ")");
+                else if (Float.parseFloat(tweets.get(position).getSentiment()) == 0.5)
+                    mSentiment.setText("Neutral (" + tweets.get(position).getSentiment() + ")");
+                else
+                    mSentiment.setText("Negative (" + tweets.get(position).getSentiment() + ")");
+            }
+            else {
+                mSentiment.setText("N/A");
+            }
+
         }
 
     }

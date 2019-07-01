@@ -39,7 +39,6 @@ import com.uni.bremen.hastag_inspektor.MicrosoftSentimentAnalyseTool.GetSentimen
 import com.uni.bremen.hastag_inspektor.MicrosoftSentimentAnalyserParser.Example;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -94,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private double longitude;
     private double latitude;
-    
+
     private static ArrayList<String> trendsList;
 
     @Override
@@ -215,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             } else if (searchView.getQuery() != null) {
                 searchView.setQuery(searchView.getQuery(), true);
             } else {
-                Toast.makeText(getBaseContext(), "NULL", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "Please input a hashtag to start searching!", Toast.LENGTH_LONG).show();
             }
 
         });
@@ -271,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return occurrencesArrayList;
     }
 
-    public static ArrayList<Tweet> getTweets () {
+    public static ArrayList<Tweet> getTweets ( ) {
         return tweets;
     }
 
@@ -344,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         searchQueryAdapter.notifyDataSetChanged();
                         historyAdapter.swapCursor(getAllItems());
                         historyAdapter.notifyDataSetChanged();
-                        Toast.makeText(MainActivity.this, "Search History Cleared!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Search history cleared!", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton(android.R.string.no, null).show();
@@ -400,9 +399,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         for (int i = 0; i < tweets.size(); i++) {
             System.out.println(tweets.get(i));
         }
+        GetSentiment getSentiment = null;
+        try {
+            getSentiment = new GetSentiment(ACCESS_KEY, HOST, PATH);
 
+        } catch (Exception ex) {
+            //System.out.println(ex.getMessage());
+            Toast.makeText(getBaseContext(), "The key for the sentiment tool is expired, please contact the developers for the new key!", Toast.LENGTH_LONG).show();
+        }
         // call the Get Sentiment to send the request to microsoft
-        GetSentiment getSentiment = new GetSentiment(ACCESS_KEY, HOST, PATH);
         try {
             // storing the response from Microsoft in a String
             String response = getSentiment.getTheSentiment(sentimentToolResponseFromMicrosoftDocuments);
@@ -412,11 +417,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             parseSentimentResponse(response);
             System.out.println("Total Sentiment Value is: " + calculateSentimentValue(tweets));
         } catch (Exception e) {
+            Toast.makeText(this, "Expired sentiment key, please contact the developers!", Toast.LENGTH_LONG).show();
+
             e.printStackTrace();
-            System.exit(1);
+//            System.exit(1);
         }
         countNumberOfOccurrences();
-        Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
     }
 
     private boolean checkFocusRec (View view) {

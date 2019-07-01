@@ -1,15 +1,17 @@
 package com.uni.bremen.hastag_inspektor.MicrosoftSentimentAnalyseTool;
 
-import java.io.*;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
-
-import javax.net.ssl.HttpsURLConnection;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
 public class GetSentiment {
@@ -17,13 +19,14 @@ public class GetSentiment {
     private String host;
     private String path;
 
-    public GetSentiment(String accessKey, String host, String path) {
+    public GetSentiment (String accessKey, String host, String path) {
         this.accessKey = accessKey;
         this.host = host;
         this.path = path;
     }
 
-    public String getTheSentiment(Documents responseFromMicrosoftDocuments) throws Exception {
+    public String getTheSentiment (Documents responseFromMicrosoftDocuments) throws Exception {
+
         String text = new Gson().toJson(responseFromMicrosoftDocuments);
         byte[] encoded_text = text.getBytes(StandardCharsets.UTF_8);
         URL url = new URL(host + path);
@@ -47,10 +50,11 @@ public class GetSentiment {
         }
         in.close();
 
+
         return response.toString();
     }
 
-    public String prettify(String json_text) {
+    public String prettify (String json_text) {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(json_text).getAsJsonObject();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
