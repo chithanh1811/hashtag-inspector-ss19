@@ -31,6 +31,7 @@ public class SimilarHashtagFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_similarhashtag, container, false);
+        System.out.println("SimilarHashtagFragment");
         similarHashtagRecyclerView = view.findViewById(R.id.related_hashtag_recyclerView);
         similarHashtagLayoutManager = new LinearLayoutManager(this.getActivity());
         similarHashtagRecyclerView.setHasFixedSize(true);

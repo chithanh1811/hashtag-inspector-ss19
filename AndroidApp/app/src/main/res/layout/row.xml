@@ -12,43 +12,42 @@
         android:id="@+id/hashTagOccurrences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:padding="15dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"
         android:text="occurence"
-        android:textAlignment="viewEnd"
-        android:textSize="14dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/checked_text_view"
+        app:layout_constraintTop_toTopOf="@+id/checked_text_view"
+        app:layout_constraintVertical_bias="1.0" />
 
     <CheckedTextView
         android:id="@+id/checked_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
         android:checked="false"
         android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
         android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
-        android:drawableEnd="@null"
-        android:drawableRight="@null"
+        android:drawablePadding="16dp"
         android:maxLines="1"
-        app:layout_constraintBottom_toBottomOf="@+id/hashTagOccurrences"
-        app:layout_constraintEnd_toStartOf="@+id/hashTagOccurrences"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/hashTagOccurrences"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="hashtag" />
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="8dp"
-        android:background="?android:attr/listDivider"
-        android:text="hashtag"
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checked_text_view" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_search_grey_24dp"
+        android:background="@drawable/symbolbuttonshape"/>
 
 </android.support.constraint.ConstraintLayout>

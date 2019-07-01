@@ -39,7 +39,6 @@ import com.uni.bremen.hastag_inspektor.MicrosoftSentimentAnalyseTool.GetSentimen
 import com.uni.bremen.hastag_inspektor.MicrosoftSentimentAnalyserParser.Example;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -62,7 +61,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     // Microsoft Sentiment
-    private final String ACCESS_KEY = "163c1ad42fe74033bf2ff74365ac939e";
+    private final String ACCESS_KEY = "a860e30cb3834a23a9c4a071988df408";
     private final String HOST = "https://westcentralus.api.cognitive.microsoft.com";
     private final String PATH = "/text/analytics/v2.1/sentiment";
 
@@ -76,12 +75,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     // muss das hier deklariert werden, denn wir brauchen dies hier spaeter in unserer second-activity
     private static ArrayList<HashtagAndOccurences> occurrencesArrayList = new ArrayList<>();
 
+    private static ArrayList<Tweet> tweets = new ArrayList<>();
+
     public static boolean clearHistory = false;
 
     private SearchView searchView;
 
     // Search Query Adapter
     public SearchQueryAdapter searchQueryAdapter;
+    // History Chip Groups Adapter
+    public HistoryAdapter historyAdapter;
+    // Trend Adapter
+    public TrendAdapter trendAdapter;
 
     // Sentiment
     private FusedLocationProviderClient client;
@@ -89,10 +94,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private double longitude;
     private double latitude;
 
-    private ArrayList<TweetsWithSentimentValue> tweetsWithSentimentValueList = new ArrayList<>();
-
-    private ArrayList<String> trendsList;
-
+    private static ArrayList<String> trendsList;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -106,8 +108,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
-        loadFragment(new ExploreFragment());
-
         BottomNavigationView navigation = findViewById(R.id.nav_view);
         navigation.setOnNavigationItemSelectedListener(MainActivity.this);
 
@@ -116,7 +116,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         dbHelper.onCreate(database);
 
         searchQueryAdapter = new SearchQueryAdapter(this, getAllItems());
+        historyAdapter = new HistoryAdapter(this, getAllItems());
 
+        trendAdapter = new TrendAdapter(this, trendsList);
         // TODO: @Sajjad: have to change it later, it's a bad use-case
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -138,36 +140,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
         Twitter twitter = tf.getInstance();
 
-        // @Thanh: Search
-        searchView = findViewById(R.id.searchView);
-        searchView.setQueryHint("Enter a Hashtag to search");
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
-            @Override
-            public boolean onQueryTextSubmit (String query) {
-                // every time the user clicks on the search button, we must clear the list
-                tweetsWithSentimentValueList.clear();
-
-                if (query.charAt(0) != '#') {
-                    query = "#" + query;
-                }
-                Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
-                addToDb(query);
-                searchQueryAdapter.swapCursor(getAllItems());
-                searchQueryAdapter.notifyDataSetChanged();
-                startSearch(query);
-                Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
-                myIntent.putExtra("title", query);
-                startActivity(myIntent);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange (String newText) {
-                return false;
-            }
-        });
-
         // Location
         client = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(MainActivity.this,
@@ -188,14 +160,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         int woeid = locations.get(0).getWoeid();
                         Trends trends = twitter.getPlaceTrends(woeid);
                         for (int i = 0; i < trends.getTrends().length; i++) {
-                            trendsList.add(trends.getTrends()[i].getName());
+                            if (trends.getTrends()[i].getName().charAt(0) == '#') {
+                                trendsList.add(trends.getTrends()[i].getName());
+                            }
                         }
-
-                        // print all the trends
-                        // we can use this list later, to show the user all the trends
-                        for (String s : trendsList) {
-                            System.out.println("Trends: " + s);
-                        }
+                        trendAdapter.update(trendsList);
+                        trendAdapter.notifyDataSetChanged();
 
                     } catch (TwitterException ex) {
                         System.out.println(ex.getMessage());
@@ -207,6 +177,32 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             }
         });
 
+        // @Thanh: Search
+        searchView = findViewById(R.id.searchView);
+        searchView.setQueryHint("Enter a Hashtag to search");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit (String query) {
+                // every time the user clicks on the search button, we must clear the list
+                tweets.clear();
+
+                if (query.charAt(0) != '#') {
+                    query = "#" + query;
+                }
+                startSearch(query);
+
+                Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
+                myIntent.putExtra("title", query);
+                startActivity(myIntent);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange (String newText) {
+                return false;
+            }
+        });
 
         // @Thanh: Search button
         FloatingActionButton searchButton = findViewById(R.id.search_button);
@@ -217,20 +213,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
             } else if (searchView.getQuery() != null) {
                 searchView.setQuery(searchView.getQuery(), true);
-                Toast.makeText(getBaseContext(), searchView.getQuery(), Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(getBaseContext(), "NULL", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "Please input a hashtag to start searching!", Toast.LENGTH_LONG).show();
             }
 
         });
 
-        // TODO @Thanh: tap anywhere to hide the keyboard
+        loadFragment(new ExploreFragment());
     }
 
     private void addToDb (String name) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(SearchQueriesDatabaseTables.SearchQueryEntry.COLUMN_NAME, name);
         database.insert(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, contentValues);
+        searchQueryAdapter.notifyDataSetChanged();
     }
 
     public void extractHashtagsFromAString (String someSampleText) {
@@ -241,11 +237,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             listOfHashtagsInTheString.add(mat.group(1).toLowerCase());
 
         }
-        for (String s : listOfHashtagsInTheString) {
-            System.out.println("Hashtag: " + s);
-        }
         listOfAllHashtags.addAll(listOfHashtagsInTheString);
-        System.out.println("++++++---------------------------------------------------++++++++");
     }
 
     private boolean isNetworkAvailable ( ) {
@@ -268,20 +260,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             occurrencesArrayList.add(new HashtagAndOccurences(s, Collections.frequency(listOfAllHashtags, s)));
         }
 
-        System.out.println("Alle Hhashtags in dieser Suchanfrage ist wie folgt: ");
-        System.out.println(Arrays.toString(listOfAllHashtags.toArray()));
-        System.out.println("Unsorted List: ");
-        System.out.println("Number of Occurrences of each item is: " + Arrays.toString(occurrencesArrayList.toArray()));
-
-
         Collections.sort(occurrencesArrayList, Comparator.comparing(HashtagAndOccurences::getNumberOfOccurrences)
                 .thenComparing(HashtagAndOccurences::getHashtagName).reversed());
 
-        System.out.println("-----------------------------------------------------");
-        System.out.println("Sorted List: ");
-        for (HashtagAndOccurences hashtagAndOccurences : occurrencesArrayList) {
-            System.out.println("Hashtag: " + hashtagAndOccurences.getHashtagName() + " || number of occurs: " + hashtagAndOccurences.getNumberOfOccurrences());
-        }
         return occurrencesArrayList;
     }
 
@@ -289,12 +270,37 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return occurrencesArrayList;
     }
 
+    public static ArrayList<Tweet> getTweets ( ) {
+        return tweets;
+    }
+
+    public static ArrayList<String> getTrendsList ( ) {
+        return trendsList;
+    }
+
     @Override
     protected void onResume ( ) {
         super.onResume();
+
         listOfAllHashtags.clear();
         occurrencesArrayList.clear();
 
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+
+        if (bundle != null) {
+            String query = bundle.getString("title");
+            System.out.println(query);
+            if (query.charAt(0) != '#') {
+                query = "#" + query;
+            }
+            intent.removeExtra("title");
+            Intent myIntent = new Intent(MainActivity.this, SearchResultsActivity.class);
+            myIntent.putExtra("title", query);
+            startActivity(myIntent);
+            startSearch(query);
+            this.finish();
+        }
     }
 
     private boolean loadFragment (Fragment fragment) {
@@ -335,7 +341,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         clearHistory = true;
                         searchQueryAdapter.swapCursor(getAllItems());
                         searchQueryAdapter.notifyDataSetChanged();
-                        Toast.makeText(MainActivity.this, "Search History Cleared!", Toast.LENGTH_SHORT).show();
+                        historyAdapter.swapCursor(getAllItems());
+                        historyAdapter.notifyDataSetChanged();
+                        Toast.makeText(MainActivity.this, "Search history cleared!", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton(android.R.string.no, null).show();
@@ -343,6 +351,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public void startSearch (String query) {
+        addToDb(query);
         configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setDebugEnabled(true)
                 .setOAuthConsumerKey("bQJQwFuUGy7B9uPuuxJtgp7Q8")
@@ -356,18 +365,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         q.setLocale("en");
         q.setLang("en");
         q.setCount(50);
-
-        int countNumberOfTweets = 0;
-        try {
-            QueryResult result = twitter.search(q);
-            for (Status status : result.getTweets()) {
-                System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
-                extractHashtagsFromAString(status.getText());
-                countNumberOfTweets++;
-            }
-        } catch (TwitterException te) {
-            Toast.makeText(getBaseContext(), te.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        tweets = new ArrayList<>();
         // create a list of documents to store the response from Microsoft
         Documents sentimentToolResponseFromMicrosoftDocuments = new Documents();
         try {
@@ -383,28 +381,33 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 // to be sent to Microsoft
                 sentimentToolResponseFromMicrosoftDocuments.add(randomUUID, "en", status.getText());
 
-                // even though the TweetsWithSentimentValue has 6 fields
+                // even though the tweet has 6 fields
                 // on the constructor we call only 5 of them
                 // because the sentiment score we get later
-                tweetsWithSentimentValueList.add(
-                        new TweetsWithSentimentValue(status.getUser().getScreenName(),
-                                status.getUser().getName(),
-                                status.getId(),
-                                status.getText(),
-                                randomUUID)
-                );
+                tweets.add(new Tweet(status, randomUUID));
             }
         } catch (TwitterException te) {
             te.printStackTrace();
         }
 
-        // TODO: delete later, only for debugging purposes
-        for (int i = 0; i < tweetsWithSentimentValueList.size(); i++) {
-            System.out.println(tweetsWithSentimentValueList.get(i));
-        }
+        searchQueryAdapter.swapCursor(getAllItems());
+        searchQueryAdapter.notifyDataSetChanged();
+        historyAdapter.swapCursor(getAllItems());
+        historyAdapter.notifyDataSetChanged();
 
+        // TODO: delete later, only for debugging purposes
+        for (int i = 0; i < tweets.size(); i++) {
+            System.out.println(tweets.get(i));
+        }
+        GetSentiment getSentiment = null;
+        try {
+            getSentiment = new GetSentiment(ACCESS_KEY, HOST, PATH);
+
+        } catch (Exception ex) {
+            //System.out.println(ex.getMessage());
+            Toast.makeText(getBaseContext(), "The key for the sentiment tool is expired, please contact the developers for the new key!", Toast.LENGTH_LONG).show();
+        }
         // call the Get Sentiment to send the request to microsoft
-        GetSentiment getSentiment = new GetSentiment(ACCESS_KEY, HOST, PATH);
         try {
             // storing the response from Microsoft in a String
             String response = getSentiment.getTheSentiment(sentimentToolResponseFromMicrosoftDocuments);
@@ -412,14 +415,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             response = getSentiment.prettify(response);
             // in this part, we are going to call the parse Sentiment Response from Microsoft
             parseSentimentResponse(response);
-            System.out.println("Total Sentiment Value is: " + calculateSentimentValue(tweetsWithSentimentValueList));
+            System.out.println("Total Sentiment Value is: " + calculateSentimentValue(tweets));
         } catch (Exception e) {
+            Toast.makeText(this, "Expired sentiment key, please contact the developers!", Toast.LENGTH_LONG).show();
+
             e.printStackTrace();
-            System.exit(1);
+//            System.exit(1);
         }
         countNumberOfOccurrences();
-        Toast.makeText(getBaseContext(), "Number of Tweets: " + countNumberOfTweets, Toast.LENGTH_LONG).show();
-        Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
     }
 
     private boolean checkFocusRec (View view) {
@@ -443,32 +446,32 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         System.out.println(json);
         Example[] data = gson.fromJson(json, Example[].class);
         for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < tweetsWithSentimentValueList.size(); j++) {
-                if (tweetsWithSentimentValueList.get(j).getRandomUUID().equals(data[j].getId())) {
-                    tweetsWithSentimentValueList.get(i).setSentimentValue(
+            for (int j = 0; j < tweets.size(); j++) {
+                if (tweets.get(j).getUUID().equals(data[j].getId())) {
+                    tweets.get(i).setSentiment(
                             String.valueOf(data[i].getScore())
                     );
                     break;
                 }
             }
         }
-        for (TweetsWithSentimentValue tweetsWithSentimentValue : tweetsWithSentimentValueList) {
+        for (Tweet tweet : tweets) {
             System.out.println(
                     "Sentiment value for UUID: "
-                            + tweetsWithSentimentValue.getRandomUUID()
+                            + tweet.getUUID()
                             + "is: "
-                            + tweetsWithSentimentValue.getSentimentValue());
+                            + tweet.getSentiment());
         }
     }
 
-    private double calculateSentimentValue (List<TweetsWithSentimentValue> tweetsWithSentimentValueList) {
+    private double calculateSentimentValue (List<Tweet> tweets) {
         double totalSentimentValue = 0.0;
-        for (int i = 0; i < tweetsWithSentimentValueList.size(); i++) {
-            if (Double.parseDouble(tweetsWithSentimentValueList.get(i).getSentimentValue()) != 0.5) {
-                totalSentimentValue += Double.parseDouble(tweetsWithSentimentValueList.get(i).getSentimentValue());
+        for (int i = 0; i < tweets.size(); i++) {
+            if (Double.parseDouble(tweets.get(i).getSentiment()) != 0.5) {
+                totalSentimentValue += Double.parseDouble(tweets.get(i).getSentiment());
             }
         }
-        return totalSentimentValue / tweetsWithSentimentValueList.size();
+        return totalSentimentValue / tweets.size();
     }
 
 }

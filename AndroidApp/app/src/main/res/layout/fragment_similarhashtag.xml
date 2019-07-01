@@ -39,7 +39,7 @@
         android:layout_height="56dp"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginBottom="96dp"
+        android:layout_marginBottom="36dp"
         android:clickable="true"
         android:elevation="6dp"
         android:focusable="true"

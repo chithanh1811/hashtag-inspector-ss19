@@ -15,8 +15,8 @@ public class TabAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position)
     {
         switch (position){
-            case 0 : return new TweetFragment();
-            case 1 : return new SimilarHashtagFragment();
+            case 0 : return new SimilarHashtagFragment();
+            case 1 : return new TweetFragment();
         }
         return null;
     }
@@ -32,9 +32,9 @@ public class TabAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position){
             case 0 :
-                return "Tweets";
-            case 1 :
                 return "Similar Hashtags";
+            case 1 :
+                return "Tweets";
         }
         return null;
     }
