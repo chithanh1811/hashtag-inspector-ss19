@@ -153,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     longitude = location.getLongitude();
                     latitude = location.getLatitude();
                     trendsList = new ArrayList<>();
-
                     try {
                         ResponseList<twitter4j.Location> locations;
                         locations = twitter.getClosestTrends(new GeoLocation(latitude, longitude));
@@ -169,8 +168,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
                     } catch (TwitterException ex) {
                         System.out.println(ex.getMessage());
-                        // exit from the app, if you couldn't get the location from the user
-                        System.exit(1);
+                        Toast.makeText(getBaseContext(), "Twitter Internal Error " + ex.getMessage(), Toast.LENGTH_LONG).show();
+
                     }
 
                 }
@@ -218,7 +217,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             }
 
         });
-
         loadFragment(new ExploreFragment());
     }
 
@@ -390,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             }
         } catch (TwitterException te) {
             te.printStackTrace();
+            Toast.makeText(getBaseContext(), te.toString(), Toast.LENGTH_LONG).show();
         }
 
         searchQueryAdapter.swapCursor(getAllItems());
@@ -407,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         } catch (Exception ex) {
             //System.out.println(ex.getMessage());
-            Toast.makeText(getBaseContext(), "The key for the sentiment tool is expired, please contact the developers for the new key!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "Expired sentiment key, please contact the developers!", Toast.LENGTH_LONG).show();
         }
         // call the Get Sentiment to send the request to microsoft
         try {
@@ -420,9 +419,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             System.out.println("Total Sentiment Value is: " + calculateSentimentValue(tweets));
         } catch (Exception e) {
             Toast.makeText(this, "Expired sentiment key, please contact the developers!", Toast.LENGTH_LONG).show();
-
             e.printStackTrace();
-//            System.exit(1);
         }
         countNumberOfOccurrences();
     }
