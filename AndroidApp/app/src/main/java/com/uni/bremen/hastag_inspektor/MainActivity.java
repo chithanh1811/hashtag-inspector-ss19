@@ -61,7 +61,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     // Microsoft Sentiment
-    private final String ACCESS_KEY = "a860e30cb3834a23a9c4a071988df408";
+    private final String ACCESS_KEY = "249abfc639e7484a86e3e3f178ce70fb";
     private final String HOST = "https://westcentralus.api.cognitive.microsoft.com";
     private final String PATH = "/text/analytics/v2.1/sentiment";
 
