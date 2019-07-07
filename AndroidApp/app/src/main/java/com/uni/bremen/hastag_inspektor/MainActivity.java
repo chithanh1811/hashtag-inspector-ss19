@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         if (bundle != null) {
             String query = bundle.getString("title");
             if (query != null) {
-                System.out.println(query);
+
                 if (query.charAt(0) != '#') {
                     query = "#" + query;
                 }
@@ -396,10 +396,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         historyAdapter.swapCursor(getAllItems());
         historyAdapter.notifyDataSetChanged();
 
-        // TODO: delete later, only for debugging purposes
-        for (int i = 0; i < tweets.size(); i++) {
-            System.out.println(tweets.get(i));
-        }
         GetSentiment getSentiment = null;
         try {
             getSentiment = new GetSentiment(ACCESS_KEY, HOST, PATH);
@@ -416,7 +412,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             response = getSentiment.prettify(response);
             // in this part, we are going to call the parse Sentiment Response from Microsoft
             parseSentimentResponse(response);
-            System.out.println("Total Sentiment Value is: " + calculateSentimentValue(tweets));
         } catch (Exception e) {
             Toast.makeText(this, "Expired sentiment key, please contact the developers!", Toast.LENGTH_LONG).show();
             e.printStackTrace();
@@ -442,7 +437,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         Gson gson = new Gson();
         JsonParser parser = new JsonParser();
         JsonArray json = (JsonArray) parser.parse(response).getAsJsonObject().get("documents");
-        System.out.println(json);
         Example[] data = gson.fromJson(json, Example[].class);
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < tweets.size(); j++) {
@@ -453,13 +447,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     break;
                 }
             }
-        }
-        for (Tweet tweet : tweets) {
-            System.out.println(
-                    "Sentiment value for UUID: "
-                            + tweet.getUUID()
-                            + "is: "
-                            + tweet.getSentiment());
         }
     }
 
