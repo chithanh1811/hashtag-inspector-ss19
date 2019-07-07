@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public Cursor getAllItems ( ) {
-        Cursor newCursor = database.query(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null, null, null, null, null);
+        Cursor newCursor = database.query(SearchQueriesDatabaseTables.SearchQueryEntry.TABLE_NAME, null, null, null, null, null, "_ID DESC" );
         return newCursor;
     }
 
